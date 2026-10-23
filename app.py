@@ -53,52 +53,122 @@ st.markdown("""
         font-size: 15px;
     }
 
-    /* کادر آپلود فوق‌گرافیکی HUD */
+    /* ─── کادر آپلود نئونی وسط‌چین ─── */
     [data-testid="stFileUploader"] {
-        max-width: 820px;
-        margin: 0 auto 30px auto;
+        max-width: 860px;
+        margin: 0 auto 40px auto;
         direction: rtl !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
+
     [data-testid="stFileUploaderDropzone"] {
-        background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.08) 0%, rgba(4, 16, 45, 0.95) 100%) !important;
-        border: 2px dashed rgba(0, 240, 255, 0.6) !important;
-        border-radius: 18px !important;
-        padding: 30px 20px !important;
-        box-shadow: 0 0 30px rgba(0, 240, 255, 0.18), inset 0 0 20px rgba(0, 240, 255, 0.08) !important;
-        transition: all 0.3s ease !important;
+        background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.09) 0%, rgba(4, 16, 45, 0.98) 100%) !important;
+        border: 2px dashed rgba(0, 234, 255, 0.65) !important;
+        border-radius: 20px !important;
+        padding: 40px 20px 38px 20px !important;
+        min-height: 190px !important;
+        box-shadow: 0 0 40px rgba(0, 234, 255, 0.20), inset 0 0 25px rgba(0, 234, 255, 0.10) !important;
+        transition: all 0.3s ease-in-out !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
         text-align: center !important;
+        gap: 14px !important;
     }
+
     [data-testid="stFileUploaderDropzone"]:hover {
-        border-color: #00f0ff !important;
-        box-shadow: 0 0 45px rgba(0, 240, 255, 0.45), inset 0 0 30px rgba(0, 240, 255, 0.2) !important;
+        border-color: #00eaff !important;
+        box-shadow: 0 0 55px rgba(0, 234, 255, 0.50), inset 0 0 40px rgba(0, 234, 255, 0.15) !important;
         transform: scale(1.01);
     }
-    [data-testid="stFileUploaderDropzone"] div {
-        text-align: center !important;
+
+    /* محتوای داخلی دراپ‌زون */
+    [data-testid="stFileUploaderDropzone"] > div {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
         justify-content: center !important;
-        color: #93c5fd !important;
-        font-family: 'Vazir', Tahoma, sans-serif !important;
+        text-align: center !important;
+        width: 100% !important;
+        gap: 10px !important;
     }
+
+    /* راهنمای متن داخل کادر آپلود */
+    [data-testid="stFileUploaderDropzoneInstructions"] {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+    }
+
+    [data-testid="stFileUploaderDropzoneInstructions"] > div {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    /* متن اصلی (Drag and drop file here) */
+    [data-testid="stFileUploaderDropzoneInstructions"] span {
+        font-size: 17px !important;
+        font-weight: 800 !important;
+        color: #f1f9ff !important;
+        text-align: center !important;
+        line-height: 2.0 !important;
+        letter-spacing: 0.2px !important;
+        text-shadow: 0 0 12px rgba(0, 234, 255, 0.35) !important;
+    }
+
+    /* متن فرعی (Limit 200MB per file • JPG, PNG) */
+    [data-testid="stFileUploaderDropzoneInstructions"] small {
+        font-size: 14.5px !important;
+        font-weight: 600 !important;
+        color: #7dd3fc !important;
+        text-align: center !important;
+        margin-top: 6px !important;
+        opacity: 0.95 !important;
+    }
+
+    /* دکمه Browse files */
     [data-testid="stFileUploaderDropzone"] button {
-        background: linear-gradient(135deg, #0284c7 0%, #00f0ff 100%) !important;
+        background: linear-gradient(135deg, #0399d6 0%, #00eaff 100%) !important;
         color: #03081a !important;
         font-weight: 900 !important;
+        font-size: 15px !important;
         border: none !important;
-        border-radius: 10px !important;
-        padding: 10px 26px !important;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.6) !important;
-        transition: all 0.2s ease !important;
+        border-radius: 12px !important;
+        padding: 9px 32px !important;
+        margin-top: 6px !important;
+        box-shadow: 0 0 24px rgba(0, 234, 255, 0.65) !important;
+        transition: all 0.25s ease !important;
+        letter-spacing: 0.3px !important;
     }
+
     [data-testid="stFileUploaderDropzone"] button:hover {
-        box-shadow: 0 0 35px rgba(0, 240, 255, 0.9) !important;
-        transform: scale(1.06);
+        background: linear-gradient(135deg, #04b5f5 0%, #33f3ff 100%) !important;
+        box-shadow: 0 0 40px rgba(0, 234, 255, 0.95) !important;
+        transform: scale(1.05);
     }
+
+    [data-testid="stFileUploaderDropzone"] button:active {
+        transform: scale(1.02);
+    }
+
+    /* فایل انتخاب‌شده */
     [data-testid="stFileUploaderFile"] {
-        background: rgba(0, 240, 255, 0.15) !important;
-        border: 1px solid #00f0ff !important;
-        border-radius: 10px !important;
+        background: rgba(0, 234, 255, 0.18) !important;
+        border: 1px solid #00eaff !important;
+        border-radius: 12px !important;
         color: #ffffff !important;
-        padding: 6px 14px !important;
+        padding: 7px 16px !important;
+        margin-top: 10px !important;
+        box-shadow: 0 0 18px rgba(0, 234, 255, 0.35) !important;
     }
 
     /* کارت‌های شیشه‌ای مدرن */
@@ -192,20 +262,20 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── سربرگ و آیکون گرافیکی وسط‌چین برای بخش آپلود ───
+# ─── آیکون و عنوان بخش آپلود ───
 st.markdown("""
-<div style="text-align: center; margin-bottom: 12px;">
-    <div style="font-size: 42px; filter: drop-shadow(0 0 15px #00f0ff);">🩻</div>
-    <div style="font-size: 20px; font-weight: bold; color: #00f0ff; text-shadow: 0 0 12px rgba(0,240,255,0.6); margin-top: 5px;">
+<div style="text-align: center; margin-bottom: 10px;">
+    <div style="font-size: 46px; line-height: 1; filter: drop-shadow(0 0 18px rgba(0, 234, 255, 0.85));">🩻</div>
+    <div style="font-size: 21px; font-weight: 900; color: #00eaff; text-shadow: 0 0 14px rgba(0, 234, 255, 0.65); margin-top: 8px;">
         درگاه ورودی اسکن رادیوگرافی فک (OPG)
     </div>
-    <div style="font-size: 13.5px; color: #7dd3fc; margin-top: 4px;">
-        تصویر را به این کادر بکشید و رها کنید یا دکمه انتخاب را بزنید (فرمت‌های JPG، PNG)
+    <div style="font-size: 14.5px; font-weight: 600; color: #7dd3fc; margin-top: 5px; line-height: 1.9;">
+        تصویر رادیوگرافی پانورامیک خود را اینجا بارگذاری کنید
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ─── کادر آپلود فایل (بدون عنوان پیش‌فرض اضافی) ───
+# ─── کادر آپلود فایل ───
 uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
 if uploaded_file is not None:
@@ -213,7 +283,6 @@ if uploaded_file is not None:
     img_array = np.array(image)
     img_h, img_w = img_array.shape[:2]
     
-    # کالیبراسیون رزولوشن به میلی‌متر واقعی
     mm_per_pixel = 152.0 / img_h if img_h > 0 else 0.12
 
     with st.spinner("⚡ در حال اسکن لایه‌های رادیولوژی و پردازش آناتومیک فک..."):
@@ -244,19 +313,17 @@ if uploaded_file is not None:
         h_mm = round(h_px * mm_per_pixel, 1)
         aspect_ratio = w_px / h_px if h_px > 0 else 1.0
         
-        # کادر فیروزه‌ای دو لایه و گوشه‌های HUD
         cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 240, 255), 2)
         cv2.rectangle(annotated, (x1-2, y1-2), (x2+2, y2+2), (0, 114, 255), 1)
         corner_len = 12
         cv2.line(annotated, (x1, y1), (x1 + corner_len, y1), (255, 255, 255), 3)
         cv2.line(annotated, (x1, y1), (x1, y1 + corner_len), (255, 255, 255), 3)
         cv2.line(annotated, (x2, y2), (x2 - corner_len, y2), (255, 255, 255), 3)
-        cv2.line(annotated, (x2, y2), (x2 - corner_len, y2), (255, 255, 255), 3)
+        cv2.line(annotated, (x2, y2), (x2, y2 - corner_len), (255, 255, 255), 3)
         
         cv2.rectangle(annotated, (x1, y1 - 28), (x1 + 65, y1), (0, 114, 255), -1)
         cv2.putText(annotated, f"#{name}", (x1 + 5, y1 - 8), cv2.FONT_HERSHEY_DUPLEX, 0.7, (255, 255, 255), 2)
 
-        # تحلیل زاویه Winter
         if name in ["38", "48"]:
             arch_type = "فک پایین (Mandible)"
             if aspect_ratio >= 1.08:
@@ -298,12 +365,10 @@ if uploaded_file is not None:
             "conf": conf_score
         })
 
-    # نمایش تصویر
     st.image(annotated, caption="✨ اسکن هوشمند OPG با مرزبندی تشخیصی HUD", use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ─── تب‌ها ───
     tab_overview, tab_doctor, tab_patient = st.tabs([
         "🌐 اطلس دندان‌ها (Teeth HUD Map)",
         "👨‍⚕️ کنسول جراحی (Clinical Console)",
@@ -369,9 +434,9 @@ if uploaded_file is not None:
 else:
     st.markdown("""
     <div class="hud-card" style="text-align: center; padding: 40px 20px;">
-        <h3 style="color: #00f0ff;">👈 سیستم در حالت آماده‌باش (Standby)</h3>
-        <p style="color: #94a3b8; max-width: 650px; margin: 15px auto;">
-            با بارگذاری تصویر OPG در درگاه بالا، هوش مصنوعی سریعاً دندان‌های عقل را شناسایی کرده و اطلس کامل درمانی را نمایش می‌دهد.
+        <h3 style="color: #00f0ff;">⚡ سیستم در حالت آماده‌باش (Standby)</h3>
+        <p style="color: #94a3b8; max-width: 650px; margin: 15px auto; line-height: 1.9;">
+            با بارگذاری تصویر رادیوگرافی پانورامیک (OPG) در درگاه بالا، هوش مصنوعی به‌سرعت دندان‌های عقل (۱۸، ۲۸، ۳۸، ۴۸) را شناسایی، تحلیل و گزارش تخصصی دوگانه را ارائه می‌دهد.
         </p>
     </div>
     """, unsafe_allow_html=True)
