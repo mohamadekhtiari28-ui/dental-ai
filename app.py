@@ -1,621 +1,456 @@
-import streamlit as st
-from ultralytics import YOLO
+import os
 import cv2
 import numpy as np
+import streamlit as st
 from PIL import Image
-import os
+from ultralytics import YOLO
 
-# ─── تنظیمات صفحه با چیدمان باز ───
 st.set_page_config(
-    page_title="AI Dental Studio | تحلیل تخصصی OPG", 
-    page_icon="⚡", 
-    layout="wide"
+    page_title="MACAN | دستیار هوشمند دندان عقل",
+    page_icon="🦷",
+    layout="wide",
 )
 
-# ─── استایل نئونی و تم گرافیکی سایبرنتیک با بازطراحی کادر آپلود ───
 st.markdown("""
-    <style>
-    @import url('https://v1.fontapi.ir/css/Vazir');
-    
-    .stApp {
-        background: radial-gradient(circle at 50% 0%, #0a1738 0%, #03081a 100%) !important;
-        font-family: 'Vazir', Tahoma, sans-serif !important;
-        color: #e0f2fe !important;
-        direction: rtl;
-        text-align: right;
-    }
-    
-    html, body, [class*="css"], p, div, h1, h2, h3, h4, span {
-        font-family: 'Vazir', Tahoma, sans-serif !important;
-        direction: rtl;
-    }
+<style>
+@import url('https://v1.fontapi.ir/css/Vazir');
 
-    /* بنر اصلی و عنوان درخشان */
-    .glow-header {
-        text-align: center;
-        padding: 25px 10px;
-        background: linear-gradient(180deg, rgba(0, 240, 255, 0.08) 0%, rgba(3, 8, 26, 0.2) 100%);
-        border: 1px solid rgba(0, 240, 255, 0.25);
-        border-radius: 16px;
-        box-shadow: 0 0 35px rgba(0, 150, 255, 0.2);
-        margin-bottom: 25px;
-    }
-    .glow-title {
-        color: #00f0ff;
-        font-size: 32px;
-        font-weight: 900;
-        letter-spacing: 1px;
-        text-shadow: 0 0 15px rgba(0, 240, 255, 0.7);
-        margin-bottom: 6px;
-    }
-    .glow-subtitle {
-        color: #7dd3fc;
-        font-size: 15px;
-    }
+.stApp {
+    background: radial-gradient(circle at 50% 0%, #0b1b3f 0%, #030814 55%, #02040c 100%) !important;
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+    color: #e0f2fe !important;
+    direction: rtl;
+}
+html, body, [class*="css"], p, div, h1, h2, h3, h4, span, label {
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+}
+#MainMenu, footer, header { visibility: hidden; }
 
-    /* ─── کانتینر آپلود وسط‌چین ─── */
-    [data-testid="stFileUploader"] {
-        max-width: 880px;
-        margin: 0 auto 40px auto;
-        direction: rtl !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+.logo-wrap {
+    text-align: center;
+    margin: 4px auto 0 auto;
+    background: transparent !important;
+}
+.logo-wrap svg, .logo-wrap img {
+    background: transparent !important;
+    filter: drop-shadow(0 0 18px rgba(0,240,255,.45));
+}
+.brand-sub {
+    text-align: center;
+    color: #7dd3fc;
+    font-size: 14px;
+    margin: 2px 0 10px 0;
+}
 
-    /* ─── دراپ‌زون نئونی ─── */
-    [data-testid="stFileUploaderDropzone"] {
-        background: radial-gradient(circle at 50% 40%, rgba(0, 240, 255, 0.08) 0%, rgba(4, 16, 45, 0.98) 100%) !important;
-        border: 2px dashed rgba(0, 234, 255, 0.60) !important;
-        border-radius: 22px !important;
-        padding: 20px 20px 40px 20px !important;
-        min-height: 320px !important;
-        box-shadow: 0 0 45px rgba(0, 234, 255, 0.20), inset 0 0 30px rgba(0, 234, 255, 0.08) !important;
-        transition: all 0.35s ease-in-out !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-        gap: 10px !important;
-    }
+.hero-banner {
+    max-width: 1100px;
+    margin: 0 auto 12px auto;
+    text-align: center;
+    padding: 16px 18px;
+    border: 1px solid rgba(0,240,255,.28);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(0,240,255,.08), rgba(3,8,26,.18));
+    box-shadow: 0 0 28px rgba(0,180,255,.16);
+}
+.hero-banner h1 {
+    color: #00f0ff !important;
+    font-size: 28px !important;
+    letter-spacing: .6px;
+    text-shadow: 0 0 16px rgba(0,240,255,.7);
+    margin: 0 0 6px 0 !important;
+}
+.hero-banner p { color: #9ad8ff !important; margin: 0 !important; font-size: 14px !important; }
 
-    [data-testid="stFileUploaderDropzone"]:hover {
-        border-color: #00eaff !important;
-        box-shadow: 0 0 60px rgba(0, 234, 255, 0.50), inset 0 0 40px rgba(0, 234, 255, 0.15) !important;
-        transform: scale(1.005);
-    }
+.scan-caption { text-align: center; margin: 6px 0 10px 0; }
+.scan-caption h3 {
+    color: #00f0ff !important;
+    font-size: 22px !important;
+    margin: 0 0 6px 0 !important;
+    text-shadow: 0 0 12px rgba(0,240,255,.5);
+}
+.scan-caption p { color: #bfe9ff !important; font-size: 14px !important; margin: 0 !important; }
 
-    [data-testid="stFileUploaderDropzone"] > div {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-        width: 100% !important;
-    }
+.tooth-stage {
+    width: 180px;
+    height: 180px;
+    margin: 6px auto 8px auto;
+    perspective: 900px;
+}
+.tooth-spin {
+    width: 180px;
+    height: 180px;
+    animation: spinY 7s linear infinite;
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 0 16px rgba(0,240,255,.55));
+}
+@keyframes spinY {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(360deg); }
+}
 
-    /* مخفی کردن متن پیش‌فرض استریم‌لیت */
-    [data-testid="stFileUploaderDropzoneInstructions"] > div > span,
-    [data-testid="stFileUploaderDropzoneInstructions"] > div > small {
-        display: none !important;
-    }
+[data-testid="stFileUploader"] {
+    max-width: 520px !important;
+    margin: 0 auto 14px auto !important;
+    direction: ltr !important;
+}
+[data-testid="stFileUploaderDropzone"] {
+    background: radial-gradient(circle at 50% 50%, rgba(0,240,255,.08), rgba(4,16,45,.95)) !important;
+    border: 2px dashed rgba(0,240,255,.7) !important;
+    border-radius: 18px !important;
+    min-height: 92px !important;
+    padding: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 0 24px rgba(0,240,255,.16), inset 0 0 18px rgba(0,240,255,.06) !important;
+}
+[data-testid="stFileUploaderDropzoneInstructions"] { display: none !important; }
 
-    [data-testid="stFileUploaderDropzoneInstructions"] {
-        margin-top: 6px !important;
-    }
+[data-testid="stFileUploaderDropzone"] button {
+    position: relative !important;
+    display: block !important;
+    margin: 0 auto !important;
+    min-width: 210px !important;
+    height: 48px !important;
+    overflow: hidden !important;
+    text-indent: -9999px !important;
+    font-size: 0 !important;
+    color: transparent !important;
+    background: linear-gradient(135deg, #00b4d8, #00f0ff) !important;
+    border: none !important;
+    border-radius: 14px !important;
+    box-shadow: 0 0 22px rgba(0,240,255,.65) !important;
+}
+[data-testid="stFileUploaderDropzone"] button * {
+    display: none !important;
+    visibility: hidden !important;
+}
+[data-testid="stFileUploaderDropzone"] button::after {
+    content: "آپلود تصویر OPG";
+    position: absolute;
+    inset: 0;
+    text-indent: 0 !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    font-family: 'Vazir', Tahoma, sans-serif !important;
+    color: #03101f !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+}
+[data-testid="stFileUploaderFile"] {
+    background: rgba(0,240,255,.12) !important;
+    border: 1px solid #00f0ff !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+}
 
-    /* ─── دکمه Browse ─── */
-    [data-testid="stFileUploaderDropzone"] button {
-        background: linear-gradient(135deg, #0399d6 0%, #00eaff 100%) !important;
-        color: #03081a !important;
-        font-weight: 900 !important;
-        font-size: 15px !important;
-        font-family: 'Vazir', Tahoma, sans-serif !important;
-        border: none !important;
-        border-radius: 14px !important;
-        padding: 10px 40px !important;
-        margin-top: 14px !important;
-        box-shadow: 0 0 28px rgba(0, 234, 255, 0.65) !important;
-        transition: all 0.25s ease !important;
-        letter-spacing: 0.2px !important;
-    }
+.opg-wrap [data-testid="stImage"] {
+    display: flex !important;
+    justify-content: center !important;
+}
+.opg-wrap img {
+    max-height: 320px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(0,240,255,.35) !important;
+    box-shadow: 0 0 22px rgba(0,240,255,.18) !important;
+}
 
-    [data-testid="stFileUploaderDropzone"] button:hover {
-        background: linear-gradient(135deg, #04b5f5 0%, #33f3ff 100%) !important;
-        box-shadow: 0 0 45px rgba(0, 234, 255, 0.98) !important;
-        transform: scale(1.05);
-    }
+.hud-card {
+    background: rgba(8,24,58,.72);
+    border: 1px solid rgba(0,240,255,.32);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.28);
+}
+.standby {
+    max-width: 980px;
+    margin: 10px auto 20px auto;
+    text-align: center;
+    padding: 28px 18px;
+}
+.standby h3 { color: #00f0ff !important; margin-bottom: 8px !important; }
+.standby p { color: #9fb7d3 !important; max-width: 720px; margin: 0 auto !important; }
 
-    [data-testid="stFileUploaderDropzone"] button:active {
-        transform: scale(1.02);
-    }
-
-    /* فایل انتخاب‌شده */
-    [data-testid="stFileUploaderFile"] {
-        background: rgba(0, 234, 255, 0.18) !important;
-        border: 1px solid #00eaff !important;
-        border-radius: 12px !important;
-        color: #ffffff !important;
-        padding: 7px 16px !important;
-        margin-top: 14px !important;
-        box-shadow: 0 0 18px rgba(0, 234, 255, 0.35) !important;
-        font-family: 'Vazir', Tahoma, sans-serif !important;
-    }
-
-    /* ─── انیمیشن 3 بعدی دندان عقل ─── */
-    .tooth-scene {
-        width: 95px;
-        height: 120px;
-        perspective: 900px;
-        margin: 0 auto 10px auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-
-    .tooth-3d {
-        width: 70px;
-        height: 95px;
-        position: relative;
-        transform-style: preserve-3d;
-        animation: toothRotateY 6s linear infinite;
-        will-change: transform;
-        filter: drop-shadow(0 0 14px rgba(0, 234, 255, 0.45));
-    }
-
-    @keyframes toothRotateY {
-        0% {
-            transform: rotateY(0deg);
-        }
-        100% {
-            transform: rotateY(360deg);
-        }
-    }
-
-    .tooth-crown {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 58px;
-        height: 48px;
-        border-radius: 50% 50% 48% 48% / 60% 60% 40% 40%;
-        background: radial-gradient(circle at 50% 30%,
-                    #ffffff 0%,
-                    #f5faff 40%,
-                    #dceeff 70%,
-                    #c9e6ff 100%);
-        box-shadow: inset 0 -6px 10px rgba(120, 160, 210, 0.25),
-                    0 0 20px rgba(0, 234, 255, 0.25);
-        border: 1px solid rgba(255, 255, 255, 0.55);
-    }
-
-    .tooth-crown::before {
-        content: "";
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 34px;
-        height: 14px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 50% 40%,
-                    rgba(255, 255, 255, 0.95) 0%,
-                    rgba(255, 255, 255, 0.40) 70%,
-                    rgba(255, 255, 255, 0.10) 100%);
-    }
-
-    .tooth-crown::after {
-        content: "";
-        position: absolute;
-        bottom: 6px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 42px;
-        height: 6px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 50% 50%,
-                    rgba(150, 190, 240, 0.35) 0%,
-                    rgba(150, 190, 240, 0.15) 60%,
-                    rgba(150, 190, 240, 0.05) 100%);
-    }
-
-    .tooth-neck {
-        position: absolute;
-        top: 42px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 38px;
-        height: 10px;
-        border-radius: 40% 40% 50% 50% / 60% 60% 40% 40%;
-        background: linear-gradient(to bottom,
-                    #f5faff 0%,
-                    #e6f3ff 60%,
-                    #d6e9ff 100%);
-        box-shadow: inset 0 -2px 4px rgba(140, 175, 220, 0.25);
-    }
-
-    .tooth-root-main {
-        position: absolute;
-        top: 50px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 16px;
-        height: 40px;
-        border-radius: 40% 40% 60% 60% / 30% 30% 70% 70%;
-        background: linear-gradient(to bottom,
-                    #eaf5ff 0%,
-                    #f7fbff 40%,
-                    #e2efff 100%);
-        box-shadow: inset 0 -6px 8px rgba(130, 170, 220, 0.28);
-    }
-
-    .tooth-root-left {
-        position: absolute;
-        top: 52px;
-        left: calc(50% - 9px);
-        transform: translateX(-50%) rotate(-12deg);
-        width: 9px;
-        height: 34px;
-        border-radius: 40% 40% 60% 60% / 30% 30% 70% 70%;
-        background: linear-gradient(to bottom,
-                    #eef6ff 0%,
-                    #f9fcff 50%,
-                    #e6f2ff 100%);
-        box-shadow: inset 0 -5px 7px rgba(130, 170, 220, 0.24);
-    }
-
-    .tooth-root-right {
-        position: absolute;
-        top: 52px;
-        left: calc(50% + 9px);
-        transform: translateX(-50%) rotate(12deg);
-        width: 9px;
-        height: 34px;
-        border-radius: 40% 40% 60% 60% / 30% 30% 70% 70%;
-        background: linear-gradient(to bottom,
-                    #eef6ff 0%,
-                    #f9fcff 50%,
-                    #e6f2ff 100%);
-        box-shadow: inset 0 -5px 7px rgba(130, 170, 220, 0.24);
-    }
-
-    .tooth-glow-ring {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 50% 50%,
-                    rgba(0, 234, 255, 0.10) 0%,
-                    rgba(0, 234, 255, 0.05) 40%,
-                    rgba(0, 234, 255, 0.00) 70%);
-        pointer-events: none;
-        animation: glowPulse 2.8s ease-in-out infinite alternate;
-    }
-
-    @keyframes glowPulse {
-        0% {
-            opacity: 0.55;
-            transform: translate(-50%, -50%) scale(0.98);
-        }
-        100% {
-            opacity: 0.95;
-            transform: translate(-50%, -50%) scale(1.05);
-        }
-    }
-
-    /* متن عنوان و زیرنویس آپلود */
-    .upload-title {
-        color: #00eaff;
-        font-size: 20px;
-        font-weight: 900;
-        text-align: center;
-        text-shadow: 0 0 14px rgba(0, 234, 255, 0.70);
-        margin-top: 4px;
-        line-height: 1.9;
-        font-family: 'Vazir', Tahoma, sans-serif !important;
-    }
-
-    .upload-subtitle {
-        color: #f1f9ff;
-        font-size: 15.5px;
-        font-weight: 700;
-        text-align: center;
-        line-height: 2.0;
-        margin-top: 4px;
-        font-family: 'Vazir', Tahoma, sans-serif !important;
-        text-shadow: 0 0 10px rgba(0, 234, 255, 0.25);
-    }
-
-    .upload-limit {
-        color: #7dd3fc;
-        font-size: 14.5px;
-        font-weight: 600;
-        text-align: center;
-        margin-top: 2px;
-        opacity: 0.98;
-        font-family: 'Vazir', Tahoma, sans-serif !important;
-    }
-
-    /* کارت‌های شیشه‌ای مدرن */
-    .hud-card {
-        background: rgba(8, 24, 58, 0.65);
-        border: 1px solid rgba(0, 240, 255, 0.3);
-        border-radius: 14px;
-        padding: 18px 22px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-        margin-bottom: 18px;
-        transition: all 0.3s ease;
-    }
-    .hud-card:hover {
-        border-color: #00f0ff;
-        box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
-    }
-
-    /* تب‌های اختصاصی */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 15px;
-        background: rgba(4, 15, 38, 0.8);
-        padding: 8px 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(0, 240, 255, 0.2);
-    }
-    .stTabs [data-baseweb="tab"] {
-        font-size: 17px !important;
-        font-weight: bold;
-        color: #94a3b8 !important;
-        border-radius: 8px;
-        padding: 8px 20px;
-        font-family: 'Vazir', Tahoma, sans-serif !important;
-    }
-    .stTabs [aria-selected="true"] {
-        color: #00f0ff !important;
-        background: rgba(0, 240, 255, 0.15) !important;
-        border: 1px solid #00f0ff !important;
-        box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-    }
-
-    /* برچسب‌های وضعیت */
-    .badge-urgent {
-        background: rgba(239, 68, 68, 0.2);
-        color: #f87171;
-        border: 1px solid #ef4444;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 13px;
-    }
-    .badge-safe {
-        background: rgba(34, 197, 94, 0.2);
-        color: #4ade80;
-        border: 1px solid #22c55e;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 13px;
-    }
-    .badge-warning {
-        background: rgba(245, 158, 11, 0.2);
-        color: #fbbf24;
-        border: 1px solid #f59e0b;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 13px;
-    }
-    </style>
+.stTabs [data-baseweb="tab-list"] {
+    gap: 10px;
+    background: rgba(4,15,38,.85);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,240,255,.2);
+}
+.stTabs [data-baseweb="tab"] {
+    color: #94a3b8 !important;
+    font-weight: 800 !important;
+    border-radius: 8px;
+}
+.stTabs [aria-selected="true"] {
+    color: #00f0ff !important;
+    background: rgba(0,240,255,.14) !important;
+    border: 1px solid #00f0ff !important;
+}
+.badge-urgent { background: rgba(239,68,68,.18); color:#f87171; border:1px solid #ef4444; padding:3px 10px; border-radius:20px; font-size:12px; }
+.badge-safe { background: rgba(34,197,94,.18); color:#4ade80; border:1px solid #22c55e; padding:3px 10px; border-radius:20px; font-size:12px; }
+.badge-warning { background: rgba(245,158,11,.18); color:#fbbf24; border:1px solid #f59e0b; padding:3px 10px; border-radius:20px; font-size:12px; }
+</style>
 """, unsafe_allow_html=True)
 
-# ─── بارگذاری مدل هوش مصنوعی ───
+TOOTH_SVG = """
+<svg viewBox="0 0 300 320" width="180" height="180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e7fdff"/>
+      <stop offset="100%" stop-color="#67e8f9"/>
+    </linearGradient>
+    <filter id="tgw"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <ellipse cx="150" cy="292" rx="58" ry="10" fill="#00f0ff" opacity=".25"/>
+  <path d="M150 28
+           C206 28 238 62 236 108
+           C234 138 224 168 214 196
+           C206 220 200 252 196 278
+           C193 296 186 308 174 308
+           C164 308 158 292 150 268
+           C142 292 136 308 126 308
+           C114 308 107 296 104 278
+           C100 252 94 220 86 196
+           C76 168 66 138 64 108
+           C62 62 94 28 150 28 Z"
+        fill="url(#tg)" stroke="#00f0ff" stroke-width="5" filter="url(#tgw)"/>
+  <path d="M186 72 A70 70 0 0 1 214 128" fill="none" stroke="#9af7ff" stroke-width="3" opacity=".9"/>
+  <path d="M180 84 A56 56 0 0 1 204 128" fill="none" stroke="#9af7ff" stroke-width="2.4" opacity=".7"/>
+  <path d="M174 96 A42 42 0 0 1 194 128" fill="none" stroke="#9af7ff" stroke-width="2" opacity=".5"/>
+  <line x1="48" y1="148" x2="252" y2="148" stroke="#c4ffff" stroke-width="2">
+    <animate attributeName="opacity" values=".25;1;.25" dur="2.2s" repeatCount="indefinite"/>
+  </line>
+</svg>
+"""
+
+MACAN_LOGO = """
+<div class="logo-wrap">
+<svg viewBox="0 0 420 430" width="210" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7af6ff"/>
+      <stop offset="100%" stop-color="#1d7dff"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3.4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <path d="M210 36
+           C272 36 318 78 314 136
+           C311 172 298 208 286 240
+           C276 264 270 300 264 338
+           C260 364 254 392 238 404
+           C226 414 216 398 210 368
+           C204 398 194 414 182 404
+           C166 392 160 364 156 338
+           C150 300 144 264 134 240
+           C122 208 109 172 106 136
+           C102 78 148 36 210 36 Z"
+        fill="none" stroke="url(#g)" stroke-width="9" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M250 88 A72 72 0 0 1 292 164" fill="none" stroke="#5cf0ff" stroke-width="3" opacity=".95"/>
+  <path d="M244 102 A58 58 0 0 1 278 164" fill="none" stroke="#5cf0ff" stroke-width="2.4" opacity=".72"/>
+  <path d="M238 116 A44 44 0 0 1 264 164" fill="none" stroke="#5cf0ff" stroke-width="2" opacity=".52"/>
+  <path d="M232 130 A32 32 0 0 1 250 164" fill="none" stroke="#5cf0ff" stroke-width="1.6" opacity=".38"/>
+  <line x1="64" y1="186" x2="356" y2="186" stroke="#9af7ff" stroke-width="2.4" opacity=".95">
+    <animate attributeName="opacity" values=".35;1;.35" dur="2.4s" repeatCount="indefinite"/>
+  </line>
+  <text x="210" y="422" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="44" font-weight="700" letter-spacing="12" fill="url(#g)" filter="url(#glow)">MACAN</text>
+</svg>
+</div>
+"""
+
+
 @st.cache_resource
 def load_model():
     if not os.path.exists("best_model.pt"):
         return None
     return YOLO("best_model.pt")
 
-model = load_model()
 
+def fit_image(img, max_w=860, max_h=320):
+    h, w = img.shape[:2]
+    scale = min(max_w / float(w), max_h / float(h), 1.0)
+    if scale < 1:
+        img = cv2.resize(img, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+    return img
+
+
+def analyze_tooth(name, w_mm, h_mm, ratio, conf):
+    if name in ["38", "48"]:
+        arch = "فک پایین (Mandible)"
+        if ratio >= 1.08:
+            return {
+                "arch": arch,
+                "winter": "تخمین: افقی (Horizontal)",
+                "difficulty": "بالا",
+                "badge": '<span class="badge-urgent">احتمال نهفتگی خوابیده</span>',
+                "doc": "کادر تشخیص پهن است؛ احتمال نهفتگی افقی و تماس با مولر دوم. بررسی تحلیل ریشه دندان ۷، فاصله با کانال IAN و در صورت ابهام CBCT. خروج معمولاً با فلپ و سکشن انجام می‌شود.",
+                "patient": "این دندان احتمالاً خوابیده رشد کرده و ممکن است به دندان کناری فشار بیاورد. جای نگرانی نیست، ولی حتماً عکس را به دندان‌پزشک نشان بده.",
+            }
+        if ratio >= 0.85:
+            return {
+                "arch": arch,
+                "winter": "تخمین: مزیوانگولار",
+                "difficulty": "متوسط تا بالا",
+                "badge": '<span class="badge-warning">احتمال زاویه به جلو</span>',
+                "doc": "احتمال mesioangular؛ ریسک پاکت دیستال دندان ۷ و پریکورونیت. فضای رترومولار و طرح جراحی را ارزیابی کنید.",
+                "patient": "احتمالاً کج و متمایل به دندان جلویی است. غذا ممکن است بین دو دندان گیر کند. دندان‌پزشک می‌گوید نگه داشتن بهتر است یا کشیدن.",
+            }
+        return {
+            "arch": arch,
+            "winter": "تخمین: عمودی (Vertical)",
+            "difficulty": "ساده تا متوسط",
+            "badge": '<span class="badge-safe">رویش عمودی</span>',
+            "doc": "مسیر نزدیک به عمودی. کلاس Pell & Gregory، پوشش لثه و بهداشت ناحیه را بسنجید. اگر فضا کافی باشد ممکن است نگهداری شود.",
+            "patient": "جهت دندان نسبتاً صاف به نظر می‌رسد. اگر جا کافی باشد شاید اصلاً نیازی به کشیدن نباشد؛ مسواک زدن ته دهان خیلی مهم است.",
+        }
+
+    return {
+        "arch": "فک بالا (Maxilla)",
+        "winter": "ماگزیلاری / تخمین اولیه",
+        "difficulty": "متوسط",
+        "badge": '<span class="badge-safe">فک بالا</span>',
+        "doc": "نزدیکی ریشه به کف سینوس ماگزیلاری و ریسک شکستگی توبروزیته را در پلان خروج ببینید. خروج فک بالا معمولاً ساده‌تر از فک پایین است.",
+        "patient": "دندان عقل فک بالا معمولاً کشیدنش راحت‌تر و نقاهتش کوتاه‌تر است. دندان‌پزشک فاصله‌اش با سینوس را چک می‌کند.",
+    }
+
+
+model = load_model()
 if model is None:
-    st.error("❌ فایل مدل هوش مصنوعی (best_model.pt) در مخزن یافت نشد.")
+    st.error("❌ فایل مدل (best_model.pt) پیدا نشد.")
     st.stop()
 
 names = model.names
-target_teeth = ["18", "28", "38", "48"]
-wisdom_indices = [idx for idx, name in names.items() if name in target_teeth]
+wisdom_indices = [idx for idx, n in names.items() if n in ["18", "28", "38", "48"]]
 
-# ─── بنر بالایی هدر ───
-st.markdown("""
-<div class="glow-header">
-    <div class="glow-title">HUMAN TEETH ANATOMY & AI DIAGNOSTIC STUDIO</div>
-    <div class="glow-subtitle">سامانه فوق‌پیشرفته تحلیل رادیوگرافی پانورامیک (OPG) و ره‌گیری دندان‌های عقل</div>
-</div>
-""", unsafe_allow_html=True)
+# لوگو بدون پس‌زمینه
+l1, l2, l3 = st.columns([1.45, 1, 1.45])
+with l2:
+    if os.path.exists("logo.png"):
+        st.image(Image.open("logo.png").convert("RGBA"), use_container_width=True)
+    else:
+        st.markdown(MACAN_LOGO, unsafe_allow_html=True)
 
-# ─── بلوک گرافیکی و متن بالای کادر آپلود ───
-st.markdown("""
-<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 6px;">
-    <div class="tooth-scene">
-        <div class="tooth-glow-ring"></div>
-        <div class="tooth-3d">
-            <div class="tooth-crown"></div>
-            <div class="tooth-neck"></div>
-            <div class="tooth-root-main"></div>
-            <div class="tooth-root-left"></div>
-            <div class="tooth-root-right"></div>
-        </div>
+st.markdown('<div class="brand-sub">دستیار هوشمند تشخیص و تحلیل دندان عقل از روی OPG</div>', unsafe_allow_html=True)
+
+uploaded_file = st.file_uploader(
+    "upload_opg",
+    type=["jpg", "jpeg", "png"],
+    accept_multiple_files=False,
+    label_visibility="collapsed",
+)
+
+if uploaded_file is None:
+    st.markdown(f'<div class="tooth-stage"><div class="tooth-spin">{TOOTH_SVG}</div></div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="scan-caption">
+        <h3>درگاه ورودی اسکن رادیوگرافی فک (OPG)</h3>
+        <p>تصویر پانورامیک را اینجا بارگذاری کنید • JPG / PNG • حداکثر ۲۰۰ مگابایت</p>
     </div>
-    <div class="upload-title">درگاه ورودی اسکن رادیوگرافی فک (OPG)</div>
-    <div class="upload-subtitle">تصویر رادیوگرافی پانورامیک (OPG) را اینجا بکشید و رها کنید</div>
-    <div class="upload-limit">حداکثر حجم ۲۰۰ مگابایت • فرمت‌های JPG، PNG</div>
-</div>
-""", unsafe_allow_html=True)
-
-# ─── کادر آپلود فایل ───
-uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
-
-if uploaded_file is not None:
+    """, unsafe_allow_html=True)
+    st.markdown("""
+    <div class="hud-card standby">
+        <h3>⚡ سیستم در حالت آماده‌باش (Standby)</h3>
+        <p>با بارگذاری OPG، هوش مصنوعی دندان‌های عقل ۱۸، ۲۸، ۳۸ و ۴۸ را شناسایی می‌کند و گزارش جداگانه برای دندان‌پزشک و بیمار می‌سازد.</p>
+    </div>
+    """, unsafe_allow_html=True)
+else:
     image = Image.open(uploaded_file).convert("RGB")
     img_array = np.array(image)
-    img_h, img_w = img_array.shape[:2]
-    
-    mm_per_pixel = 152.0 / img_h if img_h > 0 else 0.12
+    img_h = img_array.shape[0]
+    mm_per_pixel = 152.0 / img_h if img_h else 0.12
 
-    with st.spinner("⚡ در حال اسکن لایه‌های رادیولوژی و پردازش آناتومیک فک..."):
+    with st.spinner("⚡ MACAN در حال تحلیل OPG..."):
         results = model.predict(
-            source=img_array, 
-            classes=wisdom_indices, 
-            conf=0.35, 
-            show_conf=False, 
-            line_width=3,
-            verbose=False
+            source=img_array,
+            classes=wisdom_indices,
+            conf=0.35,
+            show_conf=False,
+            verbose=False,
         )
 
     res = results[0]
-    
     annotated = img_array.copy()
-    detected_boxes = res.boxes
     teeth_data = []
 
-    for box in detected_boxes:
-        cls_id = int(box.cls[0])
-        name = names[cls_id]
-        conf_score = float(box.conf[0])
+    for box in res.boxes:
+        name = names[int(box.cls[0])]
+        conf = float(box.conf[0])
         x1, y1, x2, y2 = map(int, box.xyxy[0].cpu().numpy())
-        
-        w_px = x2 - x1
-        h_px = y2 - y1
+        w_px, h_px = x2 - x1, y2 - y1
         w_mm = round(w_px * mm_per_pixel, 1)
         h_mm = round(h_px * mm_per_pixel, 1)
-        aspect_ratio = w_px / h_px if h_px > 0 else 1.0
-        
+        ratio = w_px / h_px if h_px else 1.0
+
         cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 240, 255), 2)
-        cv2.rectangle(annotated, (x1-2, y1-2), (x2+2, y2+2), (0, 114, 255), 1)
-        corner_len = 12
-        cv2.line(annotated, (x1, y1), (x1 + corner_len, y1), (255, 255, 255), 3)
-        cv2.line(annotated, (x1, y1), (x1, y1 + corner_len), (255, 255, 255), 3)
-        cv2.line(annotated, (x2, y2), (x2 - corner_len, y2), (255, 255, 255), 3)
-        cv2.line(annotated, (x2, y2), (x2, y2 - corner_len), (255, 255, 255), 3)
-        
-        cv2.rectangle(annotated, (x1, y1 - 28), (x1 + 65, y1), (0, 114, 255), -1)
-        cv2.putText(annotated, f"#{name}", (x1 + 5, y1 - 8), cv2.FONT_HERSHEY_DUPLEX, 0.7, (255, 255, 255), 2)
+        cv2.rectangle(annotated, (x1, y1 - 24), (x1 + 54, y1), (0, 114, 255), -1)
+        cv2.putText(annotated, f"#{name}", (x1 + 4, y1 - 7), cv2.FONT_HERSHEY_DUPLEX, 0.62, (255, 255, 255), 2)
 
-        if name in ["38", "48"]:
-            arch_type = "فک پایین (Mandible)"
-            if aspect_ratio >= 1.08:
-                winter = "کاملاً افقی (Horizontal)"
-                difficulty = "بالا (جراحی تخصصی با سکشن)"
-                badge = '<span class="badge-urgent">ریسک بالا - نیازمند خارج‌سازی</span>'
-                doc_analysis = "نهفتگی افقی با انطباق بالا بر دندان مولر دوم (#7)؛ احتمال بالای تحلیل ریشه (Root Resorption) و گیر پاتولوژیک؛ بررسی دقیق نزدیکی به کانال مندیبولار (IAN) با CBCT الزامی است؛ ضرورت انجام همی‌سکشن و استئوتومی کورتیکال."
-                patient_analysis = "این دندان کاملاً به صورت افقی (خوابیده) رشد کرده و سرش به ریشه دندان مجاور تکیه داده است. با گذشت زمان می‌تواند به دندان کناری آسیب بزند یا سبب دردهای نامشخص فک شود. بهتر است در اولین فرصت با یک جراحی کوتاه و دقیق خارج شود."
-            elif aspect_ratio >= 0.85:
-                winter = "زاویه‌دار رو به جلو (Mesioangular)"
-                difficulty = "متوسط رو به بالا (جراحی استخوانی)"
-                badge = '<span class="badge-warning">زاویه‌دار به جلو - نیازمند پایش</span>'
-                doc_analysis = "دندان مزیوانگولار است؛ تشکیل پاکت پریودنتال عمیق در مزیال دندان عقل و دیستال دندان ۷ محتمل است؛ پریکورونیت عودکننده در بافت نرم رترومولار پیش‌بینی می‌شود."
-                patient_analysis = "دندانت کج درآمده و مثل این می‌ماند که به دندان سالمت تکیه زده باشد! فضای بین این دو دندان مستعد گیر کردن غذاست و تمیز کردنش سخته. برای پیشگیری از خرابی دندان کناری، خارج کردنش منطقی‌ترین راه حل است."
-            else:
-                winter = "عمودی (Vertical)"
-                difficulty = "ساده تا متوسط"
-                badge = '<span class="badge-safe">رویش عمودی</span>'
-                doc_analysis = "مسیر رویش نرمال عمودی؛ در صورت کفایت طول قوس مندیبل، پتانسیل رویش کامل دارد؛ ارزیابی فضا بین دندان و راموس مندیبل (Pell & Gregory Class I/II)."
-                patient_analysis = "جهت دندانت کاملاً صاف و سربالاست! اگر جای کافی در فکت داشته باشد ممکن است اصلاً نیازی به کشیدن نداشته باشد. فقط حواست باشد ته دهان است و باید موقع مسواک زدن خوب به آن برسی."
-        else:
-            arch_type = "فک بالا (Maxilla)"
-            winter = "ماگزیلاری عمودی / مایل"
-            difficulty = "متوسط (وابسته به مجاورت سینوس)"
-            badge = '<span class="badge-safe">فک بالا</span>'
-            doc_analysis = "ارزیابی فاصله ریشه‌ها با کف سینوس ماگزیلاری (Maxillary Sinus)؛ دقت در فشار لوکساتور برای جلوگیری از جابجایی ریشه (Displacement) به فضای سینوسی؛ مراقبت از شکستگی استخوان توبروزیته."
-            patient_analysis = "این دندان در فک بالایت است. خبر خوش اینه که دندان‌های عقل فک بالا معمولاً استخوان نرم‌تری در اطرافشان دارند و کشیدنشان خیلی سریع‌تر و با کمترین ناراحتی بعد از عمل انجام می‌شود."
-
+        info = analyze_tooth(name, w_mm, h_mm, ratio, conf)
         teeth_data.append({
             "name": name,
-            "arch": arch_type,
             "w": w_mm,
             "h": h_mm,
-            "winter": winter,
-            "difficulty": difficulty,
-            "badge": badge,
-            "doc": doc_analysis,
-            "patient": patient_analysis,
-            "conf": conf_score
+            "conf": conf,
+            **info,
         })
 
-    st.image(annotated, caption="✨ اسکن هوشمند OPG با مرزبندی تشخیصی HUD", use_container_width=True)
+    left, mid, right = st.columns([1.15, 1.7, 1.15])
+    with mid:
+        st.markdown('<div class="opg-wrap">', unsafe_allow_html=True)
+        st.image(fit_image(annotated), caption="اسکن OPG")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    if not teeth_data:
+        st.info("دندان عقلی با اطمینان کافی پیدا نشد.")
+    else:
+        tab1, tab2, tab3 = st.tabs(["🌐 اطلس دندان‌ها", "👨‍⚕️ کنسول جراحی", "💬 گزارش بیمار"])
 
-    tab_overview, tab_doctor, tab_patient = st.tabs([
-        "🌐 اطلس دندان‌ها (Teeth HUD Map)",
-        "👨‍⚕️ کنسول جراحی (Clinical Console)",
-        "💬 وضعیت برای بیمار (Patient Hub)"
-    ])
-
-    with tab_overview:
-        st.markdown("### 📊 وضعیت دندان‌های عقل در قوس دندانی (Dental Arch):")
-        cols = st.columns(len(teeth_data) if len(teeth_data) > 0 else 1)
-        for i, item in enumerate(sorted(teeth_data, key=lambda x: x["name"])):
-            with cols[i]:
-                st.markdown(f"""
-                <div class="hud-card">
-                    <div style="font-size: 24px; font-weight: bold; color: #00f0ff;">🦷 دندان شماره {item['name']}</div>
-                    <div style="color: #94a3b8; font-size: 13px; margin-bottom: 8px;">{item['arch']}</div>
-                    {item['badge']}
-                    <hr style="border-color: rgba(0,240,255,0.2);">
-                    <div style="font-size: 14px; line-height: 2;">
-                        📐 عرض تقریبی: <b>{item['w']} mm</b><br>
-                        📏 طول تخمینی: <b>{item['h']} mm</b><br>
-                        🧭 زاویه وینتر: <b>{item['winter']}</b><br>
-                        🎯 اطمینان AI: <b>{item['conf']*100:.1f}%</b>
+        with tab1:
+            st.markdown("### وضعیت دندان‌های عقل در قوس دندانی")
+            cols = st.columns(len(teeth_data))
+            for i, item in enumerate(sorted(teeth_data, key=lambda x: x["name"])):
+                with cols[i]:
+                    st.markdown(f"""
+                    <div class="hud-card">
+                        <div style="font-size:20px;font-weight:800;color:#00f0ff;">🦷 دندان {item['name']}</div>
+                        <div style="color:#94a3b8;font-size:13px;margin:6px 0;">{item['arch']}</div>
+                        {item['badge']}
+                        <hr style="border-color:rgba(0,240,255,.2);">
+                        <div style="font-size:14px;line-height:1.95;">
+                            عرض تقریبی: <b>{item['w']} mm</b><br>
+                            طول تقریبی: <b>{item['h']} mm</b><br>
+                            زاویه: <b>{item['winter']}</b><br>
+                            اطمینان مدل: <b>{item['conf']*100:.1f}%</b>
+                        </div>
                     </div>
+                    """, unsafe_allow_html=True)
+
+        with tab2:
+            for item in sorted(teeth_data, key=lambda x: x["name"]):
+                st.markdown(f"""
+                <div class="hud-card" style="border-right:5px solid #00f0ff;">
+                    <b style="color:#38bdf8;font-size:17px;">دندان #{item['name']}</b>
+                    <span style="float:left;color:#cbd5e1;">سختی تخمینی: {item['difficulty']}</span>
+                    <div style="margin-top:8px;line-height:1.85;">{item['doc']}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
-    with tab_doctor:
-        st.markdown("### 📋 ارزیابی رادیولوژیک و پلان درمانی پیشنهادی (مختص جراح / دندان‌پزشک):")
-        for item in sorted(teeth_data, key=lambda x: x["name"]):
-            st.markdown(f"""
-            <div class="hud-card" style="border-right: 5px solid #00f0ff;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 20px; font-weight: bold; color: #38bdf8;">گزارش بالینی دندان عقل #{item['name']} ({item['arch']})</span>
-                    <span style="font-size: 14px; color: #cbd5e1;">درجه سختی خروج: <b>{item['difficulty']}</b></span>
-                </div>
-                <div style="margin-top: 12px; font-size: 14.5px; line-height: 1.8; color: #e2e8f0;">
-                    <b>🔹 طبقه‌بندی زاویه (Winter's Classification):</b> {item['winter']}<br>
-                    <b>🔹 ملاحظات بیومکانیک و رادیوگرافیک:</b> {item['doc']}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    with tab_patient:
-        st.markdown("### 💡 اوضاع دندان‌های عقل شما چطوره؟ (به زبان خیلی ساده و خودمانی):")
-        for item in sorted(teeth_data, key=lambda x: x["name"]):
-            st.markdown(f"""
-            <div class="hud-card" style="border-right: 5px solid #22c55e;">
-                <div style="font-size: 19px; font-weight: bold; color: #4ade80; margin-bottom: 8px;">
-                    🌱 وضعیت دندان شماره {item['name']} شما:
-                </div>
-                <div style="font-size: 15px; line-height: 1.9; color: #f8fafc;">
+        with tab3:
+            for item in sorted(teeth_data, key=lambda x: x["name"]):
+                st.markdown(f"""
+                <div class="hud-card" style="border-right:5px solid #22c55e;">
+                    <div style="color:#4ade80;font-weight:800;margin-bottom:6px;">دندان شماره {item['name']}</div>
                     {item['patient']}
                 </div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown("""
-        <div style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(0, 240, 255, 0.05); border-radius: 12px; border: 1px dashed rgba(0, 240, 255, 0.3);">
-            💙 <b>یادآوری دوستانه:</b> این گزارش کامپیوتر هوشمنده و اصلاً جای نگرانی نداره! در اولین فرصت رادیوگرافی‌ات رو به دندان‌پزشکت نشون بده تا بر اساس وضعیت لثه و دهانت بهترین راهکار رو بهت پیشنهاد بده.
-        </div>
-        """, unsafe_allow_html=True)
-
-else:
-    st.markdown("""
-    <div class="hud-card" style="text-align: center; padding: 40px 20px;">
-        <h3 style="color: #00f0ff;">⚡ سیستم در حالت آماده‌باش (Standby)</h3>
-        <p style="color: #94a3b8; max-width: 650px; margin: 15px auto; line-height: 1.9;">
-            با بارگذاری تصویر رادیوگرافی پانورامیک (OPG) در درگاه بالا، هوش مصنوعی به‌سرعت دندان‌های عقل (۱۸، ۲۸، ۳۸، ۴۸) را شناسایی، تحلیل و گزارش تخصصی دوگانه را ارائه می‌دهد.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
+                """, unsafe_allow_html=True)
+            st.caption("گزارش MACAN تخمین اولیه است و جایگزین معاینه دندان‌پزشک نیست. زاویه و اندازه بدون کالیبراسیون رادیوگرافی محاسبه شده‌اند.")
