@@ -53,9 +53,9 @@ st.markdown("""
         font-size: 15px;
     }
 
-    /* ─── کادر آپلود نئونی وسط‌چین ─── */
+    /* ─── کانتینر آپلود وسط‌چین ─── */
     [data-testid="stFileUploader"] {
-        max-width: 860px;
+        max-width: 880px;
         margin: 0 auto 40px auto;
         direction: rtl !important;
         display: flex;
@@ -63,29 +63,29 @@ st.markdown("""
         align-items: center;
     }
 
+    /* ─── دراپ‌زون نئونی ─── */
     [data-testid="stFileUploaderDropzone"] {
-        background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.09) 0%, rgba(4, 16, 45, 0.98) 100%) !important;
-        border: 2px dashed rgba(0, 234, 255, 0.65) !important;
-        border-radius: 20px !important;
-        padding: 40px 20px 38px 20px !important;
-        min-height: 190px !important;
-        box-shadow: 0 0 40px rgba(0, 234, 255, 0.20), inset 0 0 25px rgba(0, 234, 255, 0.10) !important;
-        transition: all 0.3s ease-in-out !important;
+        background: radial-gradient(circle at 50% 40%, rgba(0, 240, 255, 0.08) 0%, rgba(4, 16, 45, 0.98) 100%) !important;
+        border: 2px dashed rgba(0, 234, 255, 0.60) !important;
+        border-radius: 22px !important;
+        padding: 20px 20px 40px 20px !important;
+        min-height: 320px !important;
+        box-shadow: 0 0 45px rgba(0, 234, 255, 0.20), inset 0 0 30px rgba(0, 234, 255, 0.08) !important;
+        transition: all 0.35s ease-in-out !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
         text-align: center !important;
-        gap: 14px !important;
+        gap: 10px !important;
     }
 
     [data-testid="stFileUploaderDropzone"]:hover {
         border-color: #00eaff !important;
-        box-shadow: 0 0 55px rgba(0, 234, 255, 0.50), inset 0 0 40px rgba(0, 234, 255, 0.15) !important;
-        transform: scale(1.01);
+        box-shadow: 0 0 60px rgba(0, 234, 255, 0.50), inset 0 0 40px rgba(0, 234, 255, 0.15) !important;
+        transform: scale(1.005);
     }
 
-    /* محتوای داخلی دراپ‌زون */
     [data-testid="stFileUploaderDropzone"] > div {
         display: flex !important;
         flex-direction: column !important;
@@ -93,66 +93,37 @@ st.markdown("""
         justify-content: center !important;
         text-align: center !important;
         width: 100% !important;
-        gap: 10px !important;
     }
 
-    /* راهنمای متن داخل کادر آپلود */
+    /* مخفی کردن متن پیش‌فرض استریم‌لیت */
+    [data-testid="stFileUploaderDropzoneInstructions"] > div > span,
+    [data-testid="stFileUploaderDropzoneInstructions"] > div > small {
+        display: none !important;
+    }
+
     [data-testid="stFileUploaderDropzoneInstructions"] {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-        margin: 0 auto !important;
-    }
-
-    [data-testid="stFileUploaderDropzoneInstructions"] > div {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-    }
-
-    /* متن اصلی (Drag and drop file here) */
-    [data-testid="stFileUploaderDropzoneInstructions"] span {
-        font-size: 17px !important;
-        font-weight: 800 !important;
-        color: #f1f9ff !important;
-        text-align: center !important;
-        line-height: 2.0 !important;
-        letter-spacing: 0.2px !important;
-        text-shadow: 0 0 12px rgba(0, 234, 255, 0.35) !important;
-    }
-
-    /* متن فرعی (Limit 200MB per file • JPG, PNG) */
-    [data-testid="stFileUploaderDropzoneInstructions"] small {
-        font-size: 14.5px !important;
-        font-weight: 600 !important;
-        color: #7dd3fc !important;
-        text-align: center !important;
         margin-top: 6px !important;
-        opacity: 0.95 !important;
     }
 
-    /* دکمه Browse files */
+    /* ─── دکمه Browse ─── */
     [data-testid="stFileUploaderDropzone"] button {
         background: linear-gradient(135deg, #0399d6 0%, #00eaff 100%) !important;
         color: #03081a !important;
         font-weight: 900 !important;
         font-size: 15px !important;
+        font-family: 'Vazir', Tahoma, sans-serif !important;
         border: none !important;
-        border-radius: 12px !important;
-        padding: 9px 32px !important;
-        margin-top: 6px !important;
-        box-shadow: 0 0 24px rgba(0, 234, 255, 0.65) !important;
+        border-radius: 14px !important;
+        padding: 10px 40px !important;
+        margin-top: 14px !important;
+        box-shadow: 0 0 28px rgba(0, 234, 255, 0.65) !important;
         transition: all 0.25s ease !important;
-        letter-spacing: 0.3px !important;
+        letter-spacing: 0.2px !important;
     }
 
     [data-testid="stFileUploaderDropzone"] button:hover {
         background: linear-gradient(135deg, #04b5f5 0%, #33f3ff 100%) !important;
-        box-shadow: 0 0 40px rgba(0, 234, 255, 0.95) !important;
+        box-shadow: 0 0 45px rgba(0, 234, 255, 0.98) !important;
         transform: scale(1.05);
     }
 
@@ -167,8 +138,208 @@ st.markdown("""
         border-radius: 12px !important;
         color: #ffffff !important;
         padding: 7px 16px !important;
-        margin-top: 10px !important;
+        margin-top: 14px !important;
         box-shadow: 0 0 18px rgba(0, 234, 255, 0.35) !important;
+        font-family: 'Vazir', Tahoma, sans-serif !important;
+    }
+
+    /* ─── انیمیشن 3 بعدی دندان عقل ─── */
+    .tooth-scene {
+        width: 95px;
+        height: 120px;
+        perspective: 900px;
+        margin: 0 auto 10px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .tooth-3d {
+        width: 70px;
+        height: 95px;
+        position: relative;
+        transform-style: preserve-3d;
+        animation: toothRotateY 6s linear infinite;
+        will-change: transform;
+        filter: drop-shadow(0 0 14px rgba(0, 234, 255, 0.45));
+    }
+
+    @keyframes toothRotateY {
+        0% {
+            transform: rotateY(0deg);
+        }
+        100% {
+            transform: rotateY(360deg);
+        }
+    }
+
+    .tooth-crown {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 58px;
+        height: 48px;
+        border-radius: 50% 50% 48% 48% / 60% 60% 40% 40%;
+        background: radial-gradient(circle at 50% 30%,
+                    #ffffff 0%,
+                    #f5faff 40%,
+                    #dceeff 70%,
+                    #c9e6ff 100%);
+        box-shadow: inset 0 -6px 10px rgba(120, 160, 210, 0.25),
+                    0 0 20px rgba(0, 234, 255, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+    .tooth-crown::before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 34px;
+        height: 14px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 40%,
+                    rgba(255, 255, 255, 0.95) 0%,
+                    rgba(255, 255, 255, 0.40) 70%,
+                    rgba(255, 255, 255, 0.10) 100%);
+    }
+
+    .tooth-crown::after {
+        content: "";
+        position: absolute;
+        bottom: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 42px;
+        height: 6px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 50%,
+                    rgba(150, 190, 240, 0.35) 0%,
+                    rgba(150, 190, 240, 0.15) 60%,
+                    rgba(150, 190, 240, 0.05) 100%);
+    }
+
+    .tooth-neck {
+        position: absolute;
+        top: 42px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 38px;
+        height: 10px;
+        border-radius: 40% 40% 50% 50% / 60% 60% 40% 40%;
+        background: linear-gradient(to bottom,
+                    #f5faff 0%,
+                    #e6f3ff 60%,
+                    #d6e9ff 100%);
+        box-shadow: inset 0 -2px 4px rgba(140, 175, 220, 0.25);
+    }
+
+    .tooth-root-main {
+        position: absolute;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 16px;
+        height: 40px;
+        border-radius: 40% 40% 60% 60% / 30% 30% 70% 70%;
+        background: linear-gradient(to bottom,
+                    #eaf5ff 0%,
+                    #f7fbff 40%,
+                    #e2efff 100%);
+        box-shadow: inset 0 -6px 8px rgba(130, 170, 220, 0.28);
+    }
+
+    .tooth-root-left {
+        position: absolute;
+        top: 52px;
+        left: calc(50% - 9px);
+        transform: translateX(-50%) rotate(-12deg);
+        width: 9px;
+        height: 34px;
+        border-radius: 40% 40% 60% 60% / 30% 30% 70% 70%;
+        background: linear-gradient(to bottom,
+                    #eef6ff 0%,
+                    #f9fcff 50%,
+                    #e6f2ff 100%);
+        box-shadow: inset 0 -5px 7px rgba(130, 170, 220, 0.24);
+    }
+
+    .tooth-root-right {
+        position: absolute;
+        top: 52px;
+        left: calc(50% + 9px);
+        transform: translateX(-50%) rotate(12deg);
+        width: 9px;
+        height: 34px;
+        border-radius: 40% 40% 60% 60% / 30% 30% 70% 70%;
+        background: linear-gradient(to bottom,
+                    #eef6ff 0%,
+                    #f9fcff 50%,
+                    #e6f2ff 100%);
+        box-shadow: inset 0 -5px 7px rgba(130, 170, 220, 0.24);
+    }
+
+    .tooth-glow-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 50%,
+                    rgba(0, 234, 255, 0.10) 0%,
+                    rgba(0, 234, 255, 0.05) 40%,
+                    rgba(0, 234, 255, 0.00) 70%);
+        pointer-events: none;
+        animation: glowPulse 2.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes glowPulse {
+        0% {
+            opacity: 0.55;
+            transform: translate(-50%, -50%) scale(0.98);
+        }
+        100% {
+            opacity: 0.95;
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+    }
+
+    /* متن عنوان و زیرنویس آپلود */
+    .upload-title {
+        color: #00eaff;
+        font-size: 20px;
+        font-weight: 900;
+        text-align: center;
+        text-shadow: 0 0 14px rgba(0, 234, 255, 0.70);
+        margin-top: 4px;
+        line-height: 1.9;
+        font-family: 'Vazir', Tahoma, sans-serif !important;
+    }
+
+    .upload-subtitle {
+        color: #f1f9ff;
+        font-size: 15.5px;
+        font-weight: 700;
+        text-align: center;
+        line-height: 2.0;
+        margin-top: 4px;
+        font-family: 'Vazir', Tahoma, sans-serif !important;
+        text-shadow: 0 0 10px rgba(0, 234, 255, 0.25);
+    }
+
+    .upload-limit {
+        color: #7dd3fc;
+        font-size: 14.5px;
+        font-weight: 600;
+        text-align: center;
+        margin-top: 2px;
+        opacity: 0.98;
+        font-family: 'Vazir', Tahoma, sans-serif !important;
     }
 
     /* کارت‌های شیشه‌ای مدرن */
@@ -201,6 +372,7 @@ st.markdown("""
         color: #94a3b8 !important;
         border-radius: 8px;
         padding: 8px 20px;
+        font-family: 'Vazir', Tahoma, sans-serif !important;
     }
     .stTabs [aria-selected="true"] {
         color: #00f0ff !important;
@@ -262,16 +434,22 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── آیکون و عنوان بخش آپلود ───
+# ─── بلوک گرافیکی و متن بالای کادر آپلود ───
 st.markdown("""
-<div style="text-align: center; margin-bottom: 10px;">
-    <div style="font-size: 46px; line-height: 1; filter: drop-shadow(0 0 18px rgba(0, 234, 255, 0.85));">🩻</div>
-    <div style="font-size: 21px; font-weight: 900; color: #00eaff; text-shadow: 0 0 14px rgba(0, 234, 255, 0.65); margin-top: 8px;">
-        درگاه ورودی اسکن رادیوگرافی فک (OPG)
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 6px;">
+    <div class="tooth-scene">
+        <div class="tooth-glow-ring"></div>
+        <div class="tooth-3d">
+            <div class="tooth-crown"></div>
+            <div class="tooth-neck"></div>
+            <div class="tooth-root-main"></div>
+            <div class="tooth-root-left"></div>
+            <div class="tooth-root-right"></div>
+        </div>
     </div>
-    <div style="font-size: 14.5px; font-weight: 600; color: #7dd3fc; margin-top: 5px; line-height: 1.9;">
-        تصویر رادیوگرافی پانورامیک خود را اینجا بارگذاری کنید
-    </div>
+    <div class="upload-title">درگاه ورودی اسکن رادیوگرافی فک (OPG)</div>
+    <div class="upload-subtitle">تصویر رادیوگرافی پانورامیک (OPG) را اینجا بکشید و رها کنید</div>
+    <div class="upload-limit">حداکثر حجم ۲۰۰ مگابایت • فرمت‌های JPG، PNG</div>
 </div>
 """, unsafe_allow_html=True)
 
