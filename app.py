@@ -12,12 +12,11 @@ st.set_page_config(
     layout="wide"
 )
 
-# ─── استایل نئونی و تم گرافیکی سایبرنتیک مشابه تصویر ارسالی ───
+# ─── استایل نئونی و تم گرافیکی سایبرنتیک با بازطراحی کادر آپلود ───
 st.markdown("""
     <style>
     @import url('https://v1.fontapi.ir/css/Vazir');
     
-    /* تنظیمات پس‌زمینه و تایپوگرافی */
     .stApp {
         background: radial-gradient(circle at 50% 0%, #0a1738 0%, #03081a 100%) !important;
         font-family: 'Vazir', Tahoma, sans-serif !important;
@@ -54,6 +53,54 @@ st.markdown("""
         font-size: 15px;
     }
 
+    /* کادر آپلود فوق‌گرافیکی HUD */
+    [data-testid="stFileUploader"] {
+        max-width: 820px;
+        margin: 0 auto 30px auto;
+        direction: rtl !important;
+    }
+    [data-testid="stFileUploaderDropzone"] {
+        background: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.08) 0%, rgba(4, 16, 45, 0.95) 100%) !important;
+        border: 2px dashed rgba(0, 240, 255, 0.6) !important;
+        border-radius: 18px !important;
+        padding: 30px 20px !important;
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.18), inset 0 0 20px rgba(0, 240, 255, 0.08) !important;
+        transition: all 0.3s ease !important;
+        text-align: center !important;
+    }
+    [data-testid="stFileUploaderDropzone"]:hover {
+        border-color: #00f0ff !important;
+        box-shadow: 0 0 45px rgba(0, 240, 255, 0.45), inset 0 0 30px rgba(0, 240, 255, 0.2) !important;
+        transform: scale(1.01);
+    }
+    [data-testid="stFileUploaderDropzone"] div {
+        text-align: center !important;
+        justify-content: center !important;
+        color: #93c5fd !important;
+        font-family: 'Vazir', Tahoma, sans-serif !important;
+    }
+    [data-testid="stFileUploaderDropzone"] button {
+        background: linear-gradient(135deg, #0284c7 0%, #00f0ff 100%) !important;
+        color: #03081a !important;
+        font-weight: 900 !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 10px 26px !important;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.6) !important;
+        transition: all 0.2s ease !important;
+    }
+    [data-testid="stFileUploaderDropzone"] button:hover {
+        box-shadow: 0 0 35px rgba(0, 240, 255, 0.9) !important;
+        transform: scale(1.06);
+    }
+    [data-testid="stFileUploaderFile"] {
+        background: rgba(0, 240, 255, 0.15) !important;
+        border: 1px solid #00f0ff !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
+        padding: 6px 14px !important;
+    }
+
     /* کارت‌های شیشه‌ای مدرن */
     .hud-card {
         background: rgba(8, 24, 58, 0.65);
@@ -70,7 +117,7 @@ st.markdown("""
         box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
     }
 
-    /* تب‌های اختصاصی هایپرمدرن */
+    /* تب‌های اختصاصی */
     .stTabs [data-baseweb="tab-list"] {
         gap: 15px;
         background: rgba(4, 15, 38, 0.8);
@@ -137,7 +184,7 @@ names = model.names
 target_teeth = ["18", "28", "38", "48"]
 wisdom_indices = [idx for idx, name in names.items() if name in target_teeth]
 
-# ─── هدر گرافیکی ───
+# ─── بنر بالایی هدر ───
 st.markdown("""
 <div class="glow-header">
     <div class="glow-title">HUMAN TEETH ANATOMY & AI DIAGNOSTIC STUDIO</div>
@@ -145,8 +192,21 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── آپلود تصویر ───
-uploaded_file = st.file_uploader("📂 تصویر رادیوگرافی فک (OPG) بیمار را اینجا بارگذاری نمایید:", type=["jpg", "jpeg", "png"])
+# ─── سربرگ و آیکون گرافیکی وسط‌چین برای بخش آپلود ───
+st.markdown("""
+<div style="text-align: center; margin-bottom: 12px;">
+    <div style="font-size: 42px; filter: drop-shadow(0 0 15px #00f0ff);">🩻</div>
+    <div style="font-size: 20px; font-weight: bold; color: #00f0ff; text-shadow: 0 0 12px rgba(0,240,255,0.6); margin-top: 5px;">
+        درگاه ورودی اسکن رادیوگرافی فک (OPG)
+    </div>
+    <div style="font-size: 13.5px; color: #7dd3fc; margin-top: 4px;">
+        تصویر را به این کادر بکشید و رها کنید یا دکمه انتخاب را بزنید (فرمت‌های JPG، PNG)
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# ─── کادر آپلود فایل (بدون عنوان پیش‌فرض اضافی) ───
+uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
@@ -168,7 +228,6 @@ if uploaded_file is not None:
 
     res = results[0]
     
-    # پردازش گرافیکی باکس‌ها به رنگ آبی نئونی (Cyan HUD)
     annotated = img_array.copy()
     detected_boxes = res.boxes
     teeth_data = []
@@ -179,34 +238,30 @@ if uploaded_file is not None:
         conf_score = float(box.conf[0])
         x1, y1, x2, y2 = map(int, box.xyxy[0].cpu().numpy())
         
-        # ابعاد
         w_px = x2 - x1
         h_px = y2 - y1
         w_mm = round(w_px * mm_per_pixel, 1)
         h_mm = round(h_px * mm_per_pixel, 1)
         aspect_ratio = w_px / h_px if h_px > 0 else 1.0
         
-        # ترسیم گرافیک سایبرنتیک روی تصویر
-        # کادر فیروزه‌ای دو لایه
+        # کادر فیروزه‌ای دو لایه و گوشه‌های HUD
         cv2.rectangle(annotated, (x1, y1), (x2, y2), (0, 240, 255), 2)
         cv2.rectangle(annotated, (x1-2, y1-2), (x2+2, y2+2), (0, 114, 255), 1)
-        # گوشه‌های نئونی HUD
         corner_len = 12
         cv2.line(annotated, (x1, y1), (x1 + corner_len, y1), (255, 255, 255), 3)
         cv2.line(annotated, (x1, y1), (x1, y1 + corner_len), (255, 255, 255), 3)
         cv2.line(annotated, (x2, y2), (x2 - corner_len, y2), (255, 255, 255), 3)
-        cv2.line(annotated, (x2, y2), (x2, y2 - corner_len), (255, 255, 255), 3)
+        cv2.line(annotated, (x2, y2), (x2 - corner_len, y2), (255, 255, 255), 3)
         
-        # برچسب شماره دندان با بک‌گراند آبی
         cv2.rectangle(annotated, (x1, y1 - 28), (x1 + 65, y1), (0, 114, 255), -1)
         cv2.putText(annotated, f"#{name}", (x1 + 5, y1 - 8), cv2.FONT_HERSHEY_DUPLEX, 0.7, (255, 255, 255), 2)
 
-        # آنالیز تخصصی زاویه بر اساس Winter's Classification و آناتومی
+        # تحلیل زاویه Winter
         if name in ["38", "48"]:
             arch_type = "فک پایین (Mandible)"
             if aspect_ratio >= 1.08:
-                winter = "کاملاً افقی (Horizontal Impaction)"
-                difficulty = "بالا (جراحی پیچیده با سکشن)"
+                winter = "کاملاً افقی (Horizontal)"
+                difficulty = "بالا (جراحی تخصصی با سکشن)"
                 badge = '<span class="badge-urgent">ریسک بالا - نیازمند خارج‌سازی</span>'
                 doc_analysis = "نهفتگی افقی با انطباق بالا بر دندان مولر دوم (#7)؛ احتمال بالای تحلیل ریشه (Root Resorption) و گیر پاتولوژیک؛ بررسی دقیق نزدیکی به کانال مندیبولار (IAN) با CBCT الزامی است؛ ضرورت انجام همی‌سکشن و استئوتومی کورتیکال."
                 patient_analysis = "این دندان کاملاً به صورت افقی (خوابیده) رشد کرده و سرش به ریشه دندان مجاور تکیه داده است. با گذشت زمان می‌تواند به دندان کناری آسیب بزند یا سبب دردهای نامشخص فک شود. بهتر است در اولین فرصت با یک جراحی کوتاه و دقیق خارج شود."
@@ -222,7 +277,7 @@ if uploaded_file is not None:
                 badge = '<span class="badge-safe">رویش عمودی</span>'
                 doc_analysis = "مسیر رویش نرمال عمودی؛ در صورت کفایت طول قوس مندیبل، پتانسیل رویش کامل دارد؛ ارزیابی فضا بین دندان و راموس مندیبل (Pell & Gregory Class I/II)."
                 patient_analysis = "جهت دندانت کاملاً صاف و سربالاست! اگر جای کافی در فکت داشته باشد ممکن است اصلاً نیازی به کشیدن نداشته باشد. فقط حواست باشد ته دهان است و باید موقع مسواک زدن خوب به آن برسی."
-        else: # فک بالا 18 و 28
+        else:
             arch_type = "فک بالا (Maxilla)"
             winter = "ماگزیلاری عمودی / مایل"
             difficulty = "متوسط (وابسته به مجاورت سینوس)"
@@ -243,19 +298,18 @@ if uploaded_file is not None:
             "conf": conf_score
         })
 
-    # نمایش تصویر نئونی با ابعاد شیک
+    # نمایش تصویر
     st.image(annotated, caption="✨ اسکن هوشمند OPG با مرزبندی تشخیصی HUD", use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ─── تب‌بندی شاهکار و تفکیک‌شده ───
+    # ─── تب‌ها ───
     tab_overview, tab_doctor, tab_patient = st.tabs([
-        "🌐 نمای کلی آناتومی و دندان‌ها (Teeth HUD Map)",
-        "👨‍⚕️ کنسول جراحی و بالینی (Clinical Surgical Console)",
-        "💬 پیام صمیمانه و شفاف برای بیمار (Patient Compassionate Hub)"
+        "🌐 اطلس دندان‌ها (Teeth HUD Map)",
+        "👨‍⚕️ کنسول جراحی (Clinical Console)",
+        "💬 وضعیت برای بیمار (Patient Hub)"
     ])
 
-    # ── تب ۱: نقشه گرافیکی دندان‌ها ──
     with tab_overview:
         st.markdown("### 📊 وضعیت دندان‌های عقل در قوس دندانی (Dental Arch):")
         cols = st.columns(len(teeth_data) if len(teeth_data) > 0 else 1)
@@ -276,7 +330,6 @@ if uploaded_file is not None:
                 </div>
                 """, unsafe_allow_html=True)
 
-    # ── تب ۲: پنل فوق‌تخصصی دندان‌پزشک ──
     with tab_doctor:
         st.markdown("### 📋 ارزیابی رادیولوژیک و پلان درمانی پیشنهادی (مختص جراح / دندان‌پزشک):")
         for item in sorted(teeth_data, key=lambda x: x["name"]):
@@ -293,7 +346,6 @@ if uploaded_file is not None:
             </div>
             """, unsafe_allow_html=True)
 
-    # ── تب ۳: پیام گرم و عامیانه بیمار ──
     with tab_patient:
         st.markdown("### 💡 اوضاع دندان‌های عقل شما چطوره؟ (به زبان خیلی ساده و خودمانی):")
         for item in sorted(teeth_data, key=lambda x: x["name"]):
@@ -315,14 +367,11 @@ if uploaded_file is not None:
         """, unsafe_allow_html=True)
 
 else:
-    # صفحه شروع با گرافیک الهام‌گرفته از پوستر ارسالی
     st.markdown("""
     <div class="hud-card" style="text-align: center; padding: 40px 20px;">
-        <h3 style="color: #00f0ff;">👈 لطفاً یک عکس رادیوگرافی پانورامیک (OPG) آپلود کنید</h3>
+        <h3 style="color: #00f0ff;">👈 سیستم در حالت آماده‌باش (Standby)</h3>
         <p style="color: #94a3b8; max-width: 650px; margin: 15px auto;">
-            موتور هوش مصنوعی به صورت زنده دندان‌های عقل (شماره‌های ۱۸، ۲۸، ۳۸ و ۴۸) را ره‌گیری کرده، 
-            ابعاد، نوع نهفتگی و زوایای کج‌بودن را ارزیابی می‌کند و گزارش دوگانه به دندان‌پزشک و بیمار تحویل می‌دهد.
+            با بارگذاری تصویر OPG در درگاه بالا، هوش مصنوعی سریعاً دندان‌های عقل را شناسایی کرده و اطلس کامل درمانی را نمایش می‌دهد.
         </p>
     </div>
     """, unsafe_allow_html=True)
-    
