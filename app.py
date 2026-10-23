@@ -7,8 +7,8 @@ import os
 
 # ─── تنظیمات صفحه ───
 st.set_page_config(
-    page_title="دستیار هوشمند تشخیص دندان عقل",
-    page_icon="🦷",
+    page_title="دستیار هوشمند تشخیص دندان عقل", 
+    page_icon="🦷", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -17,7 +17,6 @@ st.set_page_config(
 st.markdown("""
     <style>
     @import url('https://v1.fontapi.ir/css/Vazir');
-
     html, body, [class*="css"], .stMarkdown, p, div, h1, h2, h3, h4, h5, span, label {
         font-family: 'Vazir', Tahoma, sans-serif !important;
         direction: rtl;
@@ -164,7 +163,7 @@ st.markdown("""
         align-items: center;
         gap: 10px;
         color: #ffffff;
-        font-size: clamp(20px, 2vw, 30px);
+        font-size: clamp(18px, 1.9vw, 28px);
         font-weight: 700;
         line-height: 1.1;
     }
@@ -204,9 +203,10 @@ st.markdown("""
 
     .tooth-location {
         color: #c9dce9;
-        font-size: clamp(12px, 1.05vw, 14px);
+        font-size: clamp(11px, 1vw, 13px);
         margin-top: -2px;
         opacity: 0.95;
+        line-height: 1.8;
     }
 
     /* بدنه کارت */
@@ -263,7 +263,7 @@ st.markdown("""
 
     /* وضعیت اعتماد */
     .confidence-wrapper {
-        margin-top: clamp(6px, 1vw, 10px);
+        margin-top: clamp(4px, 0.8vw, 8px);
         padding-top: clamp(10px, 1.2vw, 14px);
         border-top: 1px dashed rgba(255, 255, 255, 0.08);
     }
@@ -273,8 +273,9 @@ st.markdown("""
         align-items: center;
         justify-content: space-between;
         color: #d7e6f3;
-        font-size: clamp(12px, 1.05vw, 14px);
+        font-size: clamp(11px, 1vw, 13px);
         margin-bottom: clamp(8px, 1vw, 10px);
+        line-height: 1.8;
     }
 
     .confidence-percent {
@@ -300,48 +301,134 @@ st.markdown("""
         transition: width 0.6s ease-in-out;
     }
 
-    /* بخش آپلود */
-    .upload-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: clamp(40px, 6vw, 80px) 20px;
-        gap: clamp(18px, 2vw, 28px);
+    /* تصویر نتیجه */
+    .result-image-wrapper {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 191, 255, 0.25);
+        box-shadow: 0 20px 70px -40px rgba(0, 191, 255, 0.8);
+        margin-bottom: 10px;
     }
 
-    .upload-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: clamp(90px, 9vw, 120px);
-        height: clamp(90px, 9vw, 120px);
-        border-radius: 50%;
-        background: radial-gradient(120% 120% at 50% 40%, rgba(61,217,255,0.22) 0%, rgba(6,24,38,0.98) 100%);
-        border: 2px solid rgba(61, 217, 255, 0.45);
-        box-shadow: 0 0 0 10px rgba(61, 217, 255, 0.08) inset, 0 30px 80px -40px #3dd9ff;
+    /* Expander سفارشی */
+    div[data-testid="stExpander"] {
+        border: 1px solid rgba(0, 191, 255, 0.25) !important;
+        border-radius: 14px !important;
+        background-color: rgba(8, 30, 50, 0.92) !important;
+        box-shadow: 0px 14px 60px -32px rgba(0, 191, 255, 0.6);
+        overflow: hidden;
     }
 
-    .upload-title {
-        color: #3dd9ff;
-        font-size: clamp(18px, 2vw, 26px);
-        font-weight: 700;
-        line-height: 1.5;
+    div[data-testid="stExpander"] details {
+        background-color: transparent !important;
     }
 
-    .upload-subtitle {
-        color: #d7e6f3;
-        font-size: clamp(12px, 1.1vw, 15px);
-        line-height: 2.2;
-        max-width: min(680px, 90vw);
-        opacity: 0.95;
+    div[data-testid="stExpander"] summary {
+        background-color: rgba(9, 36, 60, 0.6) !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        font-size: clamp(13px, 1.05vw, 15px) !important;
+        padding: clamp(10px, 1.2vw, 14px) clamp(14px, 1.6vw, 18px) !important;
+        border-radius: 14px !important;
     }
 
-    .upload-hint {
+    div[data-testid="stExpander"] summary:hover {
+        background-color: rgba(10, 42, 70, 0.8) !important;
+    }
+
+    div[data-testid="stExpander"] svg {
+        fill: #3dd9ff !important;
+        color: #3dd9ff !important;
+    }
+
+    div[data-testid="stExpander"] > div {
+        padding: clamp(14px, 1.6vw, 18px) !important;
+    }
+
+    /* تب‌ها */
+    .stTabs [data-baseweb="tab-list"] {
+        direction: rtl;
+        gap: 10px;
+        background-color: rgba(9, 36, 60, 0.5);
+        padding: 6px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        color: #d7e6f3 !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        padding: 6px 16px !important;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background-color: rgba(61, 217, 255, 0.18) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(61, 217, 255, 0.45) !important;
+    }
+
+    /* کارت‌های تب */
+    .dentist-card {
+        background: radial-gradient(140% 140% at 50% 0%, rgba(15, 52, 86, 0.45) 0%, rgba(7, 24, 40, 0.98) 100%);
+        border-right: 4px solid #3dd9ff;
+        padding: clamp(14px, 1.6vw, 18px);
+        border-radius: 12px;
+        margin-bottom: 8px;
+        line-height: 2;
+        color: #e6f3ff;
+        box-shadow: 0px 14px 60px -32px rgba(61, 217, 255, 0.5);
+    }
+
+    .patient-card {
+        background: radial-gradient(140% 140% at 50% 0%, rgba(20, 70, 40, 0.40) 0%, rgba(7, 24, 40, 0.98) 100%);
+        border-right: 4px solid #7dd87f;
+        padding: clamp(14px, 1.6vw, 18px);
+        border-radius: 12px;
+        margin-bottom: 8px;
+        line-height: 2;
+        color: #f1fff2;
+        box-shadow: 0px 14px 60px -32px rgba(125, 216, 127, 0.5);
+    }
+
+    .dentist-card h4,
+    .patient-card h4 {
+        color: #ffffff;
+        margin-top: 0;
+        margin-bottom: clamp(10px, 1.2vw, 14px);
+        font-size: clamp(14px, 1.1vw, 16px);
+    }
+
+    .dentist-card ul,
+    .patient-card ul {
+        padding-right: 20px;
+        margin: 10px 0;
+    }
+
+    .dentist-card li,
+    .patient-card li {
+        margin-bottom: 8px;
+    }
+
+    /* هشدار */
+    .stAlert {
+        border-radius: 12px;
+        text-align: right;
+        background-color: rgba(255, 193, 7, 0.12) !important;
+        color: #ffe9a6 !important;
+        border: 1px solid rgba(255, 193, 7, 0.4) !important;
+    }
+
+    .disclaimer {
         color: #9fb9cc;
-        font-size: clamp(11px, 0.95vw, 13px);
-        opacity: 0.9;
+        font-size: clamp(11px, 0.95vw, 12.5px);
+        line-height: 2.2;
+        text-align: justify;
+        background-color: rgba(8, 30, 50, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: clamp(12px, 1.5vw, 16px);
+        margin-top: 28px;
     }
 
     div[data-testid="stFileUploader"] {
@@ -378,295 +465,10 @@ st.markdown("""
     div[data-testid="stFileUploader"] small {
         color: #b9d3e6 !important;
     }
-
-    .stAlert {
-        border-radius: 12px;
-        text-align: right;
-    }
-
-    .disclaimer {
-        color: #9fb9cc;
-        font-size: clamp(11px, 0.95vw, 12.5px);
-        line-height: 2;
-        text-align: justify;
-        background-color: rgba(8, 30, 50, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: clamp(12px, 1.5vw, 16px);
-        margin-top: 28px;
-    }
-
-    .result-image-wrapper {
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid rgba(0, 191, 255, 0.25);
-        box-shadow: 0 20px 70px -40px rgba(0, 191, 255, 0.8);
-        margin-bottom: 10px;
-    }
     </style>
 """, unsafe_allow_html=True)
 
 # ─── آیکون دندان ───
 TOOTH_SVG = """
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-  <path d="M7.5 3C5.01472 3 3 5.01472 3 7.5C3 9.98528 5.01472 12 7.5 12C7.67223 12 7.84205 11.9899 8.00879 11.9707C8.08518 12.6055 8.294 13.2037 8.61133 13.7324L7.43945 16.0762C7.15868 16.6373 7.29209 17.3151 7.76562 17.7266L9.23438 18.999C9.70791 19.4105 10.4034 19.4556 10.9258 19.1113L12 18.4023L13.0742 19.1113C13.5966 19.4556 14.2921 19.4105 14.7656 18.999L16.2344 17.7266C16.7079 17.3151 16.8413 16.6373 16.5605 16.0762L15.3887 13.7324C15.706 13.2037 15.9148 12.6055 15.9912 11.9707C16.158 11.9899 16.3278 12 16.5 12C18.9853 12 21 9.98528 21 7.5C21 5.01472 18.9853 3 16.5 3C15.173 3 13.9859 3.57329 13.1445 4.48047C12.7819 4.87155 12.2782 5.1 11.75 5.1H12.25C11.7218 5.1 11.2181 4.87155 10.8555 4.48047C10.0141 3.57329 8.827 3 7.5 3Z" fill="#3dd9ff"/>
-</svg>
-"""
-
-# ─── آیکون فلش (عرض/طول) ───
-ARROW_SVG = """
-<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3dd9ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler">
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/>
-  <path d="m14.5 12.5 2-2"/>
-  <path d="m11.5 9.5 2-2"/>
-  <path d="m8.5 6.5 2-2"/>
-  <path d="m17.5 15.5 2-2"/>
-</svg>
-"""
-
-# ─── بارگذاری مدل ───
-@st.cache_resource
-def load_model():
-    if not os.path.exists("best_model.pt"):
-        return None
-    return YOLO("best_model.pt")
-
-model = load_model()
-
-if model is None:
-    st.error("❌ فایل مدل (best_model.pt) پیدا نشد. لطفاً فایل مدل را در کنار app.py قرار دهید.")
-    st.stop()
-
-names = model.names
-target_teeth = ["18", "28", "38", "48"]
-wisdom_indices = [idx for idx, name in names.items() if name in target_teeth]
-
-# ─── اطلاعات پایه هر دندان ───
-TOOTH_DETAILS = {
-    "18": {"title": "دندان عقل بالا - سمت راست", "jaw": "maxilla", "side": "right", "jaw_fa": "فک بالا", "location_fa": "سمت راست"},
-    "28": {"title": "دندان عقل بالا - سمت چپ", "jaw": "maxilla", "side": "left", "jaw_fa": "فک بالا", "location_fa": "سمت چپ"},
-    "38": {"title": "دندان عقل پایین - سمت چپ", "jaw": "mandible", "side": "left", "jaw_fa": "فک پایین", "location_fa": "سمت چپ"},
-    "48": {"title": "دندان عقل پایین - سمت راست", "jaw": "mandible", "side": "right", "jaw_fa": "فک پایین", "location_fa": "سمت راست"},
-}
-
-# ─── تابع تعیین زاویه وینتر ───
-def get_winter_angle(tooth_name, aspect_ratio):
-    info = TOOTH_DETAILS.get(tooth_name, {})
-    jaw = info.get("jaw", "mandible")
-
-    if jaw == "mandible":
-        if aspect_ratio >= 0.88:
-            return "عمودی (Vertical)"
-        else:
-            return "عمودی (Vertical)"
-    else:
-        return "مایل (Angulated)"
-
-# ─── هدر برنامه ───
-st.markdown("""
-    <div class="top-header">
-        <h1 class="main-title">HUMAN TEETH ANATOMY & AI DIAGNOSTIC STUDIO</h1>
-        <p class="sub-title">
-            سامانه فوق‌پیشرفته تحلیل رادیوگرافی پانورامیک (OPG) و ردیابی دندان‌های عقل
-        </p>
-    </div>
-""", unsafe_allow_html=True)
-
-# ─── نوار وضعیت ───
-st.markdown("""
-    <div class="status-bar">
-        <div class="status-bar-right">
-            <div class="status-item">
-                <span class="status-dot"></span>
-                <span>سیستم در حالت آماده‌به‌کار (Standby)</span>
-            </div>
-            <div class="status-item">
-                <span>کنسول بالینی (Clinical Console)</span>
-            </div>
-            <div class="status-item">
-                <span>مرکز بیمار (Patient Hub)</span>
-            </div>
-        </div>
-        <div class="status-bar-left">
-            <div class="hud-badge">نقشه دندان‌های اطلس (Teeth HUD Map)</div>
-        </div>
-    </div>
-""", unsafe_allow_html=True)
-
-# ─── بارگذاری تصویر ───
-uploaded_file = st.file_uploader(
-    "تصویر رادیوگرافی پانورامیک (OPG) را بارگذاری کنید",
-    type=["jpg", "jpeg", "png"],
-    label_visibility="collapsed"
-)
-
-if uploaded_file is None:
-    st.markdown("""
-        <div class="upload-wrapper">
-            <div class="upload-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3dd9ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-cloud">
-                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
-                    <path d="M12 12v9"/>
-                    <path d="m16 16-4-4-4 4"/>
-                </svg>
-            </div>
-            <div class="upload-title">درگاه ورودی اسکن رادیوگرافی پانورامیک (OPG)</div>
-            <div class="upload-subtitle">
-                تصویر رادیوگرافی پانورامیک (OPG) را اینجا بکشید و رها کنید یا با کلیک بر روی دکمه «Browse files» آن را انتخاب کنید.
-            </div>
-            <div class="upload-hint">فرمت‌های مجاز: JPG، PNG – حداکثر حجم ۲۰۰ مگابایت</div>
-        </div>
-    """, unsafe_allow_html=True)
-    st.stop()
-
-# ─── پردازش تصویر ───
-image = Image.open(uploaded_file).convert("RGB")
-img_array = np.array(image)
-img_h, img_w = img_array.shape[:2]
-
-mm_per_pixel = 155.0 / img_h if img_h > 0 else 0.12
-
-with st.spinner("⏳ در حال پردازش تصویر و استخراج ویژگی‌های آناتومیک..."):
-    results = model.predict(
-        source=img_array,
-        classes=wisdom_indices,
-        conf=0.35,
-        show_conf=False,
-        line_width=3,
-        verbose=False
-    )
-
-result = results[0]
-result_image_bgr = result.plot(conf=False)
-result_image_rgb = cv2.cvtColor(result_image_bgr, cv2.COLOR_BGR2RGB)
-
-# ─── نمایش تصویر پردازش‌شده ───
-st.markdown('<div class="result-image-wrapper">', unsafe_allow_html=True)
-st.image(result_image_rgb, use_container_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-detected_boxes = result.boxes
-detected_count = len(detected_boxes)
-
-st.markdown("---")
-
-# ─── عنوان بخش نتایج ───
-st.markdown("""
-    <div class="section-title">
-        📊 وضعیت دندان‌های عقل در قوس دندانی (Dental Arch)
-    </div>
-""", unsafe_allow_html=True)
-
-if detected_count == 0:
-    st.info("ℹ️ در این تصویر هیچ دندان عقلی (۱۸، ۲۸، ۳۸، ۴۸) شناسایی نشد.")
-    st.stop()
-
-# ─── مرتب‌سازی دندان‌ها بر اساس شماره (۱۸،۲۸،۳۸،۴۸ از راست به چپ) ───
-detections_list = []
-for box in detected_boxes:
-    cls_id = int(box.cls[0])
-    tooth_name = names[cls_id]
-    conf_score = float(box.conf[0])
-
-    x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
-    width_px = x2 - x1
-    height_px = y2 - y1
-
-    width_mm = round(width_px * mm_per_pixel, 1)
-    height_mm = round(height_px * mm_per_pixel, 1)
-    aspect_ratio = width_px / height_px if height_px > 0 else 1.0
-
-    detections_list.append({
-        "tooth_name": tooth_name,
-        "conf_score": conf_score,
-        "width_mm": width_mm,
-        "height_mm": height_mm,
-        "aspect_ratio": aspect_ratio,
-    })
-
-# ترتیب نمایش: 48، 38، 28، 18
-tooth_order = {"48": 0, "38": 1, "28": 2, "18": 3}
-detections_list.sort(key=lambda x: tooth_order.get(x["tooth_name"], 99))
-
-# ─── نمایش کارت‌های دندان‌ها ───
-cols = st.columns(4, gap="large")
-
-for i, det in enumerate(detections_list):
-    tooth_name = det["tooth_name"]
-    conf_score = det["conf_score"]
-    width_mm = det["width_mm"]
-    height_mm = det["height_mm"]
-    aspect_ratio = det["aspect_ratio"]
-
-    tooth_info = TOOTH_DETAILS.get(tooth_name, {
-        "jaw_fa": "-",
-        "location_fa": "-",
-        "title": f"دندان {tooth_name}"
-    })
-
-    winter_angle = get_winter_angle(tooth_name, aspect_ratio)
-    conf_percent = round(conf_score * 100)
-
-    with cols[i]:
-        st.markdown(f"""
-            <div class="tooth-card">
-                <div class="tooth-header">
-                    <div class="tooth-number">
-                        <div class="tooth-icon">
-                            {TOOTH_SVG}
-                        </div>
-                        <span>دندان شماره {tooth_name}</span>
-                    </div>
-                    <div class="jaw-badge">{tooth_info['jaw_fa']}</div>
-                    <div class="tooth-location">{tooth_info['title']}</div>
-                </div>
-
-                <div class="tooth-body">
-                    <div class="info-row">
-                        <div class="info-label">
-                            <div class="info-icon">
-                                {ARROW_SVG}
-                            </div>
-                            <span>عرض تقریبی:</span>
-                        </div>
-                        <div class="info-value">{width_mm} mm</div>
-                    </div>
-
-                    <div class="info-row">
-                        <div class="info-label">
-                            <div class="info-icon">
-                                {ARROW_SVG}
-                            </div>
-                            <span>طول تخمینی:</span>
-                        </div>
-                        <div class="info-value">{height_mm} mm</div>
-                    </div>
-
-                    <div class="info-row">
-                        <div class="info-label">
-                            <span>🧭 زاویه وینتر:</span>
-                        </div>
-                        <div class="info-value-text">{winter_angle}</div>
-                    </div>
-
-                    <div class="confidence-wrapper">
-                        <div class="confidence-label">
-                            <span>میزان اطمینان هوش مصنوعی (AI Confidence)</span>
-                            <span class="confidence-percent">{conf_percent}%</span>
-                        </div>
-                        <div class="confidence-bar-bg">
-                            <div class="confidence-bar-fill" style="width: {conf_percent}%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-
-# ─── سلب مسئولیت ───
-st.markdown("""
-    <div class="disclaimer">
-        <strong>⚠️ سلب مسئولیت پزشکی و قانونی:</strong>
-        مقادیر، ابعاد و طبقه‌بندی‌های نمایش‌داده‌شده حاصل پردازش هوش مصنوعی بوده و صرفاً جنبهٔ کمک‌تشخیصی دارند.
-        این نتایج جایگزین ارزیابی بالینی، تشخیص تخصصی توسط دندان‌پزشک و بررسی رادیولوژیک دقیق نمی‌باشند.
-    </div>
-""", unsafe_allow_html=True)
+  <path d="M7.5 3C5.01472 3 3 5.01472 3 7.5C3 9.98528 5.01472 12 7.5 12C7.67223 12 7.84205 11.9899 8.00879 11.9707C8.08518 
