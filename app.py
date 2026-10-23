@@ -9,466 +9,213 @@ import os
 st.set_page_config(
     page_title="دستیار هوشمند تشخیص دندان عقل", 
     page_icon="🦷", 
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
 # ─── راست‌چین‌سازی کامل و فونت فارسی ───
 st.markdown("""
     <style>
     @import url('https://v1.fontapi.ir/css/Vazir');
-    html, body, [class*="css"], .stMarkdown, p, div, h1, h2, h3, h4, h5, span, label {
+    html, body, [class*="css"], .stMarkdown, p, div, h1, h2, h3, h4, span {
         font-family: 'Vazir', Tahoma, sans-serif !important;
         direction: rtl;
         text-align: right;
     }
-
-    .stApp {
-        background-color: #061826;
-    }
-
-    /* هدر بالا */
-    .top-header {
-        background: linear-gradient(90deg, rgba(6, 24, 38, 0.95) 0%, rgba(9, 40, 66, 0.95) 100%);
-        border: 1px solid rgba(0, 191, 255, 0.25);
-        border-radius: 14px;
-        padding: 28px 20px 24px 20px;
-        text-align: center;
-        margin-bottom: 10px;
-        box-shadow: 0px 10px 40px -20px rgba(0, 191, 255, 0.45);
-        backdrop-filter: blur(4px);
-    }
-
-    .main-title {
-        color: #3dd9ff;
-        font-size: clamp(20px, 2.2vw, 38px);
-        font-weight: 700;
-        margin: 0;
-        line-height: 1.4;
-        letter-spacing: -0.2px;
-    }
-
-    .sub-title {
-        color: #d7e6f3;
-        font-size: clamp(11px, 1.1vw, 15px);
-        margin-top: 14px;
-        line-height: 2;
-        opacity: 0.95;
-    }
-
-    /* نوار وضعیت */
-    .status-bar {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        background-color: rgba(8, 30, 50, 0.92);
-        border: 1px solid rgba(0, 191, 255, 0.18);
-        border-radius: 12px;
-        padding: 8px 18px;
-        margin-bottom: 28px;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-    }
-
-    .status-bar-right {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 10px 14px;
-        color: #b9d3e6;
-        font-size: clamp(10px, 0.95vw, 13px);
-    }
-
-    .status-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
-        border-radius: 999px;
-        background-color: rgba(61, 217, 255, 0.08);
-        border: 1px solid rgba(61, 217, 255, 0.25);
-        white-space: nowrap;
-    }
-
-    .status-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: #3dd9ff;
-        box-shadow: 0 0 0 3px rgba(61, 217, 255, 0.15);
-    }
-
-    .status-bar-left {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .hud-badge {
-        color: #3dd9ff;
-        font-size: clamp(10px, 0.95vw, 13px);
-        font-weight: 600;
-        padding: 6px 14px;
-        border-radius: 10px;
-        border: 1.5px solid #3dd9ff;
-        background: radial-gradient(120% 120% at 50% 0%, rgba(61,217,255,0.16) 0%, rgba(6,24,38,0.9) 100%);
-        box-shadow: 0 0 0 1px rgba(61,217,255,0.15) inset, 0 8px 40px -24px #3dd9ff;
-        white-space: nowrap;
-        letter-spacing: 0.2px;
-    }
-
-    /* عنوان بخش نتایج */
-    .section-title {
-        color: #ffffff;
-        font-size: clamp(16px, 1.6vw, 24px);
-        font-weight: 700;
-        text-align: right;
-        margin: 10px 4px 24px 4px;
-        line-height: 1.6;
-    }
-
-    /* کارت دندان */
-    .tooth-card {
-        background: radial-gradient(140% 140% at 50% 0%, rgba(15, 52, 86, 0.55) 0%, rgba(7, 24, 40, 0.98) 100%);
-        border: 1.5px solid rgba(0, 191, 255, 0.35);
-        border-radius: 16px;
-        padding: clamp(16px, 1.8vw, 22px);
-        height: 100%;
-        box-shadow: 0px 18px 60px -30px rgba(0, 191, 255, 0.6);
-        transition: all 0.25s ease-in-out;
-        position: relative;
-    }
-
-    .tooth-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(61, 217, 255, 0.55);
-        box-shadow: 0px 20px 70px -28px rgba(61, 217, 255, 0.75);
-    }
-
-    .tooth-header {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: 10px;
-        margin-bottom: clamp(14px, 1.6vw, 20px);
-    }
-
-    .tooth-number {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #ffffff;
-        font-size: clamp(18px, 1.9vw, 28px);
-        font-weight: 700;
-        line-height: 1.1;
-    }
-
-    .tooth-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: clamp(34px, 2.2vw, 40px);
-        height: clamp(34px, 2.2vw, 40px);
-        border-radius: 50%;
-        background: radial-gradient(120% 120% at 50% 40%, rgba(61,217,255,0.28) 0%, rgba(7,24,40,0.95) 100%);
-        border: 1.5px solid rgba(61, 217, 255, 0.55);
-        box-shadow: 0 0 0 4px rgba(61, 217, 255, 0.12) inset, 0 10px 40px -24px #3dd9ff;
-    }
-
-    .tooth-icon svg {
-        width: clamp(18px, 1.6vw, 22px);
-        height: clamp(18px, 1.6vw, 22px);
-    }
-
-    .jaw-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 4px 14px;
-        border-radius: 999px;
-        font-size: clamp(11px, 1vw, 13px);
-        font-weight: 600;
-        line-height: 1.8;
-        background-color: rgba(40, 167, 69, 0.16);
-        color: #7dd87f;
-        border: 1.5px solid rgba(125, 216, 127, 0.55);
-        box-shadow: 0 8px 40px -24px #7dd87f;
-        white-space: nowrap;
-    }
-
-    .tooth-location {
-        color: #c9dce9;
-        font-size: clamp(11px, 1vw, 13px);
-        margin-top: -2px;
-        opacity: 0.95;
-        line-height: 1.8;
-    }
-
-    /* بدنه کارت */
-    .tooth-body {
-        display: flex;
-        flex-direction: column;
-        gap: clamp(10px, 1.2vw, 14px);
-        margin-top: clamp(6px, 1vw, 10px);
-    }
-
-    .info-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        padding: clamp(8px, 1vw, 10px) clamp(10px, 1.2vw, 14px);
-        border-radius: 12px;
-        background-color: rgba(9, 36, 60, 0.55);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .info-label {
-        display: flex;
-        align-items: center;
-        gap: clamp(6px, 0.9vw, 8px);
-        color: #d7e6f3;
-        font-size: clamp(12px, 1.05vw, 14px);
-        font-weight: 500;
-    }
-
-    .info-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #3dd9ff;
-        opacity: 0.95;
-    }
-
-    .info-value {
-        color: #ffffff;
-        font-size: clamp(12px, 1.05vw, 14px);
-        font-weight: 700;
-        text-align: left;
-        direction: ltr;
-        white-space: nowrap;
-    }
-
-    .info-value-text {
-        color: #ffffff;
-        font-size: clamp(12px, 1.05vw, 14px);
-        font-weight: 700;
-        text-align: left;
-    }
-
-    /* وضعیت اعتماد */
-    .confidence-wrapper {
-        margin-top: clamp(4px, 0.8vw, 8px);
-        padding-top: clamp(10px, 1.2vw, 14px);
-        border-top: 1px dashed rgba(255, 255, 255, 0.08);
-    }
-
-    .confidence-label {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        color: #d7e6f3;
-        font-size: clamp(11px, 1vw, 13px);
-        margin-bottom: clamp(8px, 1vw, 10px);
-        line-height: 1.8;
-    }
-
-    .confidence-percent {
-        color: #3dd9ff;
-        font-weight: 700;
-        direction: ltr;
-    }
-
-    .confidence-bar-bg {
-        width: 100%;
-        height: clamp(6px, 0.8vw, 8px);
-        border-radius: 999px;
-        background-color: rgba(255, 255, 255, 0.12);
-        overflow: hidden;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
-    }
-
-    .confidence-bar-fill {
-        height: 100%;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #1fa2ff 0%, #3dd9ff 60%, #7df9ff 100%);
-        box-shadow: 0 0 20px -10px #3dd9ff;
-        transition: width 0.6s ease-in-out;
-    }
-
-    /* تصویر نتیجه */
-    .result-image-wrapper {
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid rgba(0, 191, 255, 0.25);
-        box-shadow: 0 20px 70px -40px rgba(0, 191, 255, 0.8);
-        margin-bottom: 10px;
-    }
-
-    /* Expander سفارشی */
-    div[data-testid="stExpander"] {
-        border: 1px solid rgba(0, 191, 255, 0.25) !important;
-        border-radius: 14px !important;
-        background-color: rgba(8, 30, 50, 0.92) !important;
-        box-shadow: 0px 14px 60px -32px rgba(0, 191, 255, 0.6);
-        overflow: hidden;
-    }
-
-    div[data-testid="stExpander"] details {
-        background-color: transparent !important;
-    }
-
-    div[data-testid="stExpander"] summary {
-        background-color: rgba(9, 36, 60, 0.6) !important;
-        color: #ffffff !important;
-        font-weight: 600 !important;
-        font-size: clamp(13px, 1.05vw, 15px) !important;
-        padding: clamp(10px, 1.2vw, 14px) clamp(14px, 1.6vw, 18px) !important;
-        border-radius: 14px !important;
-    }
-
-    div[data-testid="stExpander"] summary:hover {
-        background-color: rgba(10, 42, 70, 0.8) !important;
-    }
-
-    div[data-testid="stExpander"] svg {
-        fill: #3dd9ff !important;
-        color: #3dd9ff !important;
-    }
-
-    div[data-testid="stExpander"] > div {
-        padding: clamp(14px, 1.6vw, 18px) !important;
-    }
-
-    /* تب‌ها */
     .stTabs [data-baseweb="tab-list"] {
         direction: rtl;
-        gap: 10px;
-        background-color: rgba(9, 36, 60, 0.5);
-        padding: 6px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        gap: 12px;
     }
-
-    .stTabs [data-baseweb="tab"] {
-        color: #d7e6f3 !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        padding: 6px 16px !important;
-    }
-
-    .stTabs [aria-selected="true"] {
-        background-color: rgba(61, 217, 255, 0.18) !important;
-        color: #ffffff !important;
-        border: 1px solid rgba(61, 217, 255, 0.45) !important;
-    }
-
-    /* کارت‌های تب */
     .dentist-card {
-        background: radial-gradient(140% 140% at 50% 0%, rgba(15, 52, 86, 0.45) 0%, rgba(7, 24, 40, 0.98) 100%);
-        border-right: 4px solid #3dd9ff;
-        padding: clamp(14px, 1.6vw, 18px);
-        border-radius: 12px;
-        margin-bottom: 8px;
-        line-height: 2;
-        color: #e6f3ff;
-        box-shadow: 0px 14px 60px -32px rgba(61, 217, 255, 0.5);
+        background-color: #f0f7ff;
+        border-right: 5px solid #0066cc;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 12px;
     }
-
     .patient-card {
-        background: radial-gradient(140% 140% at 50% 0%, rgba(20, 70, 40, 0.40) 0%, rgba(7, 24, 40, 0.98) 100%);
-        border-right: 4px solid #7dd87f;
-        padding: clamp(14px, 1.6vw, 18px);
-        border-radius: 12px;
-        margin-bottom: 8px;
-        line-height: 2;
-        color: #f1fff2;
-        box-shadow: 0px 14px 60px -32px rgba(125, 216, 127, 0.5);
+        background-color: #f6fff5;
+        border-right: 5px solid #28a745;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        line-height: 1.8;
     }
-
-    .dentist-card h4,
-    .patient-card h4 {
-        color: #ffffff;
-        margin-top: 0;
-        margin-bottom: clamp(10px, 1.2vw, 14px);
-        font-size: clamp(14px, 1.1vw, 16px);
-    }
-
-    .dentist-card ul,
-    .patient-card ul {
-        padding-right: 20px;
-        margin: 10px 0;
-    }
-
-    .dentist-card li,
-    .patient-card li {
-        margin-bottom: 8px;
-    }
-
-    /* هشدار */
-    .stAlert {
-        border-radius: 12px;
-        text-align: right;
-        background-color: rgba(255, 193, 7, 0.12) !important;
-        color: #ffe9a6 !important;
-        border: 1px solid rgba(255, 193, 7, 0.4) !important;
-    }
-
-    .disclaimer {
-        color: #9fb9cc;
-        font-size: clamp(11px, 0.95vw, 12.5px);
-        line-height: 2.2;
-        text-align: justify;
-        background-color: rgba(8, 30, 50, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: clamp(12px, 1.5vw, 16px);
-        margin-top: 28px;
-    }
-
-    div[data-testid="stFileUploader"] {
-        direction: rtl;
-    }
-
-    div[data-testid="stFileUploader"] > section {
-        background-color: rgba(8, 30, 50, 0.96);
-        border: 2px dashed rgba(61, 217, 255, 0.45);
-        border-radius: 16px;
-        padding: clamp(14px, 2vw, 24px);
-        transition: all 0.25s ease-in-out;
-    }
-
-    div[data-testid="stFileUploader"] > section:hover {
-        border-color: rgba(61, 217, 255, 0.7);
-        background-color: rgba(9, 36, 60, 0.98);
-    }
-
-    div[data-testid="stFileUploader"] button {
-        background: linear-gradient(90deg, #0f7bff 0%, #3dd9ff 100%);
-        color: #061826 !important;
-        border: none;
-        border-radius: 12px;
-        font-weight: 700;
-        padding: 0.5rem 1.8rem;
-        box-shadow: 0 12px 50px -24px #3dd9ff;
-    }
-
-    div[data-testid="stFileUploader"] button:hover {
-        filter: brightness(1.05);
-    }
-
-    div[data-testid="stFileUploader"] small {
-        color: #b9d3e6 !important;
+    .size-box {
+        background-color: #fff9db;
+        border-right: 5px solid #f59f00;
+        padding: 10px 14px;
+        border-radius: 8px;
+        margin-bottom: 12px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ─── آیکون دندان ───
-TOOTH_SVG = """
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-  <path d="M7.5 3C5.01472 3 3 5.01472 3 7.5C3 9.98528 5.01472 12 7.5 12C7.67223 12 7.84205 11.9899 8.00879 11.9707C8.08518 
+# ─── بارگذاری مدل ───
+@st.cache_resource
+def load_model():
+    if not os.path.exists("best_model.pt"):
+        return None
+    return YOLO("best_model.pt")
+
+model = load_model()
+
+if model is None:
+    st.error("❌ فایل مدل (best_model.pt) پیدا نشد. لطفاً در کنار app.py در گیت‌هاب آن را آپلود کنید.")
+    st.stop()
+
+names = model.names
+target_teeth = ["18", "28", "38", "48"]
+wisdom_indices = [idx for idx, name in names.items() if name in target_teeth]
+
+# ─── اطلاعات پایه هر دندان ───
+TOOTH_DETAILS = {
+    "18": {"title": "دندان عقل بالا - سمت راست", "jaw": "maxilla", "side": "right"},
+    "28": {"title": "دندان عقل بالا - سمت چپ", "jaw": "maxilla", "side": "left"},
+    "38": {"title": "دندان عقل پایین - سمت چپ", "jaw": "mandible", "side": "left"},
+    "48": {"title": "دندان عقل پایین - سمت راست", "jaw": "mandible", "side": "right"},
+}
+
+# ─── توابع تولید توصیه‌های تخصصی و عامیانه ───
+def generate_insights(tooth_name, w_mm, h_mm, aspect_ratio):
+    info = TOOTH_DETAILS.get(tooth_name, {})
+    jaw = info.get("jaw", "mandible")
+    
+    # تخمین جهت تقریبی از روی تناسب ابعاد باکس (عرض به ارتفاع)
+    # اگر عرض پهن‌تر از حد معمول باشد یعنی دندان خوابیده/کج شده
+    if jaw == "mandible":
+        if aspect_ratio >= 0.88:
+            impaction_type = "احتمال نهفتگی افقی یا زاویه‌دار به سمت جلو (Mesioangular / Horizontal)"
+            dentist_tips = """
+            - **وضعیت احتمالی:** دندان دارای زاویه خوابیده یا مزیالی است و احتمالاً به ریشه دندان ۷ فشار می‌آورد.
+            - **ریسک بالینی:** احتمال تحلیل ریشه دندان مجاور (External Root Resorption) و ایجاد پاکت پریودنتال عمیق.
+            - **ارزیابی عصب فک:** با توجه به عمق قرارگیری، بررسی دقیق فاصله آپکس ریشه‌ها با کانال عصب مندیبولار (IAN) در رادیوگرافی الزامی است؛ در صورت سوپرایمپوز شدن آپکس با کانال، درخواست **CBCT** توصیه می‌شود.
+            - **طرح درمان:** معمولاً نیازمند جراحی با خارج‌سازی بافت نرم، فلپ و ترجیحاً سکشن کردن (Odontotomy) تاج و ریشه است.
+            """
+            patient_tips = f"""
+            سلام دوست من! دندان عقل پایینت (شماره {tooth_name}) ظاهراً صاف درنیامده و مثل این می‌ماند که کمی **خوابیده یا کج به دندان کناری‌اش تکیه داده است**.
+            - این حالت می‌تواند باعث گیر کردن غذا و ایجاد پوسیدگی روی دندان سالم کناری‌اش شود.
+            - حتماً به دندان‌پزشک سر بزن تا با یک عکس سه‌بعدی یا دقیق‌تر چک کند و در صورت نیاز با یک جراحی ساده و بی‌درد خیالت را راحت کند!
+            """
+        else:
+            impaction_type = "احتمال وضعیت عمودی یا زاویه کم (Vertical)"
+            dentist_tips = """
+            - **وضعیت احتمالی:** دندان مسیر رویش عمودی‌تری دارد.
+            - **ریسک بالینی:** احتمال پریکورونیت (عفونت لثه روی دندان نیمه‌نهفته) و گیر غذایی در ناحیه رترومولار.
+            - **طرح درمان:** در صورت داشتن فضای کافی در قوس و اکلوژن مناسب می‌تواند نگهداری شود، در غیر این صورت خارج‌سازی ساده یا جراحی جزیی لثه.
+            """
+            patient_tips = f"""
+            دندان عقلت (شماره {tooth_name}) نسبتاً صاف و سرپاست! 
+            - مهم‌ترین موضوع درباره‌اش این است که انتهایی‌ترین جای دهان است و مسواک زدنش سخته.
+            - اگر احساس درد یا بوی بد دهان نداری عالیه، ولی با دندان‌پزشکت چک کن تا مطمئن بشی لثه روش متورم نمی‌شود یا تمیز کردنش اذیتت نمی‌کند.
+            """
+    else:  # فک بالا (18, 28)
+        impaction_type = "دندان عقل فک بالا (Maxillary Molar)"
+        dentist_tips = """
+        - **وضعیت کف سینوس:** ارتباط و نزدیکی آپکس با کف سینوس ماگزیلاری (Maxillary Sinus) ارزیابی شود (ریسک جابجایی دندان یا ریشه به داخل سینوس در صورت وارد کردن فشار نامناسب).
+        - **توبریوزیته:** دقت در حین الویشن جهت پیشگیری از شکستگی استخوان توبریوزیته فک بالا.
+        - **طرح درمان:** به دلیل تراکم استخوانی کمتر فک بالا (کنسلوس بیشتر)، معمولاً خارج‌سازی روتین آسان‌تری نسبت به فک پایین دارد مگر آنکه دیستوانگولار و های-امپکت باشد.
+        """
+        patient_tips = f"""
+        این دندان در فک بالای شماست (شماره {tooth_name}). دندان‌های عقل بالا معمولاً کشیدنشان نسبت به فک پایین خیلی راحت‌تر و با درد و نقاهت خیلی کمتری همراه است.
+        دندان‌پزشک موقعیتش را نسبت به فضای هوایی بالای دندانت (سینوس) چک می‌کند تا بدون هیچ نگرانی درمانت انجام شود.
+        """
+        
+    return impaction_type, dentist_tips, patient_tips
+
+# ─── UI اصلی ───
+st.title("🦷 دستیار هوشمند و بالینی دندان عقل (OPG)")
+st.caption("سیستم تخصصی تشخیص، تخمین اندازه و ارائه توصیه‌های دندان‌پزشکی و عمومی بر پایه هوش مصنوعی")
+
+uploaded_file = st.file_uploader("تصویر رادیوگرافی پانورامیک (OPG) خود را بارگذاری کنید:", type=["jpg", "jpeg", "png"])
+
+if uploaded_file is not None:
+    image = Image.open(uploaded_file).convert("RGB")
+    img_array = np.array(image)
+    img_h, img_w = img_array.shape[:2]
+    
+    # تخمین مقیاس میلی‌متر بر حسب رزولوشن تصویر
+    # میانگین ارتفاع عمودی عکس OPG استاندارد حدود ۱۵۰ تا ۱۶۰ میلی‌متر میدان دید دارد
+    mm_per_pixel = 155.0 / img_h if img_h > 0 else 0.12
+
+    with st.spinner("⏳ در حال پردازش تصویر و استخراج ویژگی‌های آناتومیک..."):
+        results = model.predict(
+            source=img_array, 
+            classes=wisdom_indices, 
+            conf=0.35, 
+            show_conf=False, 
+            line_width=3,
+            verbose=False
+        )
+
+    result = results[0]
+    result_image_bgr = result.plot(conf=False)
+    result_image_rgb = cv2.cvtColor(result_image_bgr, cv2.COLOR_BGR2RGB)
+
+    # نمایش تصویر
+    st.image(result_image_rgb, caption="تصویر OPG همراه با محدوده‌های تشخیص داده شده", use_container_width=True)
+
+    detected_boxes = result.boxes
+    detected_count = len(detected_boxes)
+
+    st.markdown("---")
+
+    if detected_count == 0:
+        st.info("ℹ️ در این تصویر هیچ دندان عقلی (۱۸، ۲۸، ۳۸، ۴۸) یافت نشد (یا ممکن است قبلاً کشیده شده باشند).")
+    else:
+        st.success(f"✨ تعداد {detected_count} دندان عقل با موفقیت شناسایی و تحلیل شدند:")
+
+        for i, box in enumerate(detected_boxes):
+            cls_id = int(box.cls[0])
+            tooth_name = names[cls_id]
+            conf_score = float(box.conf[0])
+
+            # محاسبه مختصات و ابعاد
+            x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+            width_px = x2 - x1
+            height_px = y2 - y1
+            
+            # تبدیل به میلی‌متر تقریبی
+            width_mm = round(width_px * mm_per_pixel, 1)
+            height_mm = round(height_px * mm_per_pixel, 1)
+            aspect_ratio = width_px / height_px if height_px > 0 else 1.0
+
+            impaction_type, dentist_tips, patient_tips = generate_insights(tooth_name, width_mm, height_mm, aspect_ratio)
+
+            tooth_info = TOOTH_DETAILS.get(tooth_name, {"title": f"دندان {tooth_name}"})
+
+            # کارد کشویی برای هر دندان
+            with st.expander(f"📍 دندان شماره {tooth_name} — {tooth_info['title']}", expanded=True):
+                
+                # مشخصات ابعاد و نهفتگی
+                st.markdown(f"""
+                <div class="size-box">
+                    <b>📏 تخمین ابعاد تاج و ریشه:</b> عرض تقریبی: <b>{width_mm} میلی‌متر</b> | طول کلی: <b>{height_mm} میلی‌متر</b><br>
+                    <b>🧭 وضعیت تقریبی:</b> {impaction_type}<br>
+                    <small>🎯 میزان دقت مدل در این موقعیت: {conf_score*100:.1f} درصد</small>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # تب‌های تفکیک شده دندان‌پزشک و بیمار
+                tab_dentist, tab_patient = st.tabs(["👨‍⚕️ ملاحظات بالینی (مخصوص دندان‌پزشک)", "💬 پیام ساده و دوستانه (برای بیمار)"])
+
+                with tab_dentist:
+                    st.markdown(f"""
+                    <div class="dentist-card">
+                        <h4>📋 توصیه‌ها و هشدارهای تشخیصی:</h4>
+                        {dentist_tips}
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                with tab_patient:
+                    st.markdown(f"""
+                    <div class="patient-card">
+                        <h4>💡 اوضاع دندانت چطوره؟</h4>
+                        {patient_tips}
+                    </div>
+                    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.warning("""
+    ⚠️ **سلب مسئولیت قانونی و پزشکی:**
+    ابعاد و تحلیل‌های ذکر شده تخمین هوش مصنوعی هستند و جایگزین محاسبه کالیبره رادیولوژیست یا ارزیابی کلینیکی دندان‌پزشک نیستند.
+    """)
